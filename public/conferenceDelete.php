@@ -51,7 +51,7 @@ function ciniki_conferences_conferenceDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['conference']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2701', 'msg'=>'Airlock does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2851', 'msg'=>'Airlock does not exist.'));
     }
     $conference = $rc['conference'];
 

@@ -51,7 +51,7 @@ function ciniki_conferences_CFPLogDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['cfplog']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2701', 'msg'=>'Airlock does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2860', 'msg'=>'Airlock does not exist.'));
     }
     $cfplog = $rc['cfplog'];
 
