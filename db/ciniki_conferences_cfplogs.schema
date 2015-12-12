@@ -1,0 +1,41 @@
+#
+# Description
+# -----------
+# This table stores the where Call For Proposals have been posted.
+#
+# Fields
+# ------
+# id:               The ID assigned to the conference.
+# uuid:             The Universal Unique ID.
+# business_id:      The business the conference is attached to.
+#
+# conference_id:    The ID of the conference the CFP is for.
+#
+# name:             The website or person submitted to.
+#
+# url:              The URL to the website.
+# email:            The email address used to notify about cfp.
+#
+# sent_date:        The date the CFP was submitted or sent.
+#
+# notes:            The notes for the submission.
+#
+# date_added:       The UTC date and time the record was added.
+# last_updated:     The UTC date and time the record was last updated.
+#
+create table ciniki_conferences_cfplogs (
+    id int not null auto_increment,
+    uuid char(36) not null,
+    business_id int not null,
+    conference_id int not null,
+    name varchar(150) not null,
+    url varchar(250) not null,
+    email varchar(250) not null,
+    sent_date date not null,
+    notes varchar(1000) not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    primary key (id),
+    unique index (uuid),
+    index sync (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';

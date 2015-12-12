@@ -1,0 +1,66 @@
+<?php
+//
+// Description
+// -----------
+//
+// Arguments
+// ---------
+//
+// Returns
+// -------
+//
+function ciniki_conferences_objects($ciniki) {
+	
+	$objects = array();
+	$objects['conference'] = array(
+		'name'=>'Conference',
+        'o_name'=>'conference',
+        'o_container'=>'conferences',
+		'sync'=>'yes',
+		'table'=>'ciniki_conferences',
+		'fields'=>array(
+			'name'=>array('name'=>'Name'),
+			'permalink'=>array('name'=>'Permalink'),
+			'status'=>array('name'=>'Status', 'default'=>'10'),
+			'flags'=>array('name'=>'Flags', 'default'=>'0'),
+			'start_date'=>array('name'=>'Start Date'),
+			'end_date'=>array('name'=>'End Date'),
+			'synopsis'=>array('name'=>'Synopsis', 'default'=>''),
+			'description'=>array('name'=>'Description', 'default'=>''),
+			),
+		'history_table'=>'ciniki_conferences_history',
+		);
+	$objects['cfplog'] = array(
+		'name'=>'CFP Log',
+        'o_name'=>'cfplog',
+        'o_container'=>'cfplogs',
+		'sync'=>'yes',
+		'table'=>'ciniki_conferences_cfplogs',
+		'fields'=>array(
+			'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+			'name'=>array('name'=>'Name'),
+			'url'=>array('name'=>'URL', 'default'=>''),
+			'email'=>array('name'=>'Email', 'default'=>''),
+			'sent_date'=>array('name'=>'Date', 'default'=>''),
+			'notes'=>array('name'=>'Notes', 'default'=>''),
+			),
+		'history_table'=>'ciniki_conferences_history',
+		);
+	$objects['cfplogtag'] = array(
+		'name'=>'CFP Log Tag',
+        'o_name'=>'tag',
+        'o_container'=>'tags',
+		'sync'=>'yes',
+		'table'=>'ciniki_conferences_tags',
+		'fields'=>array(
+			'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+			'tag_type'=>array('name'=>'Tag Type'),
+			'tag_name'=>array('name'=>'Tag Name'),
+			'permalink'=>array('name'=>'Permalink'),
+			),
+		'history_table'=>'ciniki_conferences_history',
+		);
+	
+	return array('stat'=>'ok', 'objects'=>$objects);
+}
+?>
