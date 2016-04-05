@@ -35,6 +35,13 @@
 #
 # description:      The full description of the conference.
 #
+# imap_mailbox:     The mailbox where the submissions come from.
+#
+# imap_username:    The username to access the mailbox.
+# imap_password:    The password for the mailbox.
+#
+# imap_subject:     Search the imap box for messages that contain this string in their subject.
+#
 # date_added:       The UTC date and time the record was added.
 # last_updated:     The UTC date and time the record was last updated.
 #
@@ -50,6 +57,10 @@ create table ciniki_conferences (
     end_date date not null,
     synopsis varchar(2000) not null,
     description varchar(10000) not null,
+    imap_mailbox varchar(250) not null,
+    imap_username varchar(150) not null,
+    imap_password varchar(150) not null,
+    imap_subject varchar(150) not null,
     date_added datetime not null,
     last_updated datetime not null,
     primary key (id),
@@ -57,4 +68,4 @@ create table ciniki_conferences (
     unique index (business_id, permalink),
     index (name, start_date),
     index sync (business_id, uuid, last_updated)
-) ENGINE='InnoDB', COMMENT='v1.01';
+) ENGINE='InnoDB', COMMENT='v1.02';

@@ -37,24 +37,30 @@ function ciniki_conferences_main() {
 		//
 		// The conference panel 
 		//
-		this.conference = new M.panel('Service',
+		this.conference = new M.panel('Conference',
 			'ciniki_conferences_main', 'conference',
 			'mc', 'large narrowaside', 'sectioned', 'ciniki.conferences.conferences.conference');
 		this.conference.data = {};
 		this.conference.conference_id = 0;
 		this.conference.sections = {
-			'info':{'label':'Service', 'aside':'yes', 'list':{
+			'info':{'label':'Conference', 'aside':'yes', 'list':{
 				'name':{'label':'Name'},
 				'status_text':{'label':'Status'},
 				'start_date':{'label':'Start'},
                 'end_date':{'label':'End'},
             }},
+			'presentation_stats':{'label':'Presentations', 'aside':'yes', 'type':'simplegrid', 'num_cols':1,
+                },
 //            '_tabs':{'label':'', 'type':'paneltabs', 'selected':'recent', 'tabs':{
 //                'recent':{'label':'Overview', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"recent");'},
 //                'cfplog':{'label':'CFPs', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"cfplog");'},
 //                'presentations':{'label':'Presentations', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"freetrials");'},
 //                'registrations':{'label':'Delegates', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"subscribers");'},
 //            }},
+            'presentations':{'label':'Latest Submissions', 'type':'simplegrid', 'num_cols':2, 
+                'cellClasses':['multiline', ''],
+                'noData':'No Submissions',
+                },
 //			'recenttrades':{'label':'Recent Trades', 'type':'simplegrid', 'num_cols':6,
 //                'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='recent'?'yes':'no';},
 //                'noData':'No Trades',
@@ -91,16 +97,27 @@ function ciniki_conferences_main() {
             }
         };
         this.conference.cellValue = function(s, i, j, d) {
-            if( s == 'cfplogs' ) {
+            if( s == 'presentation_stats' ) {
+                return d.name + ' <span class="count">' + d.count + '</span>'; 
+            } else if( s == 'cfplogs' ) {
                 switch (j) {
                     case 0: return '<span class="maintext">' + d.name + '</span><span class="subtext">' + d.email + ((d.email!=''&&d.url!='')?'/':'') + d.url + '</span>';
                     case 1: return d.sent_date;
+                }
+            } else if( s == 'presentations' ) {
+                switch (j) {
+                    case 0: return '<span class="maintext">' + d.title + '</span><span class="subtext">' + d.display_name + '</span>';
+                    case 1: return d.status_text;
                 }
             }
         };
         this.conference.rowFn = function(s, i, d) {
             if( s == 'cfplogs' ) {
                 return 'M.ciniki_conferences_main.cfplogEdit(\'M.ciniki_conferences_main.conferenceShow();\',M.ciniki_conferences_main.conference.conference_id,\'' + d.id + '\');';
+            } else if( s == 'presentation_stats' ) {
+                return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'status\':\'' + i + '\'});';
+            } else if( s == 'presentations' ) {
+                return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'presentation_id\':\'' + d.id + '\'});';
             }
         };
         this.conference.addButton('edit', 'Edit', 'M.ciniki_conferences_main.conferenceEdit(\'M.ciniki_conferences_main.conferenceShow();\',M.ciniki_conferences_main.conference.conference_id);');
@@ -122,6 +139,14 @@ function ciniki_conferences_main() {
                 'start_date':{'label':'Start Date', 'type':'date'},
                 'end_date':{'label':'End Date', 'type':'date'},
                 }}, 
+            '_imap':{'label':'Email Submissions', 'aside':'yes',
+                'active':function() {return (M.curBusiness.modules['ciniki.conferences'].flags&0x02)>0?'yes':'no';},
+                'fields':{
+                'imap_mailbox':{'label':'Mailbox', 'type':'text'},
+                'imap_username':{'label':'Username', 'type':'text'},
+                'imap_password':{'label':'Password', 'type':'text'},
+                'imap_subject':{'label':'Subject', 'type':'text'},
+                }},
 			'_synopsis':{'label':'Synopsis', 'fields':{
                 'synopsis':{'label':'', 'hidelabel':'yes', 'hint':'', 'size':'small', 'type':'textarea'},
                 }},
@@ -191,6 +216,8 @@ function ciniki_conferences_main() {
         var args = {'business_id':M.curBusinessID, 'conference_id':this.conference.conference_id};
 //        args[this.conference.sections._tabs.selected] = 'yes';
         args['cfplogs'] = 'yes';
+        args['presentations'] = 'yes';
+        args['stats'] = 'yes';
 		M.api.getJSONCb('ciniki.conferences.conferenceGet', args, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);

@@ -1,0 +1,9 @@
+#
+# This file will add the uuid to ciniki_events
+# which is required for the sync to work.
+#
+ALTER TABLE ciniki_conferences ADD COLUMN imap_mailbox varchar(250) not null AFTER description;
+ALTER TABLE ciniki_conferences ADD COLUMN imap_username varchar(150) not null AFTER imap_mailbox;
+ALTER TABLE ciniki_conferences ADD COLUMN imap_password varchar(150) not null AFTER imap_username;
+ALTER TABLE ciniki_conferences ADD COLUMN imap_subject varchar(150) not null AFTER imap_password;
+ALTER TABLE ciniki_conferences COMMENT='v1.02';

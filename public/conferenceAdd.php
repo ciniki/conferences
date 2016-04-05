@@ -27,8 +27,12 @@ function ciniki_conferences_conferenceAdd(&$ciniki) {
         'flags'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Flags'),
         'start_date'=>array('required'=>'yes', 'blank'=>'no', 'type'=>'date', 'name'=>'Start Date'),
         'end_date'=>array('required'=>'yes', 'blank'=>'no', 'type'=>'date', 'name'=>'End Date'),
-        'synopsis'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Synopsis'),
-        'description'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Description'),
+        'synopsis'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Synopsis'),
+        'description'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Description'),
+        'imap_mailbox'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'IMAP Mailbox'),
+        'imap_username'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'IMAP Username'),
+        'imap_password'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'IMAP Password'),
+        'imap_subject'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'IMAP Subject'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
