@@ -18,8 +18,8 @@
 # vote:             The reviewers vote on the presentation
 #
 #                   0 - Undecided
-#                   50 - Accept
-#                   100 - Reject
+#                   30 - Accept
+#                   50 - Reject
 #
 # notes:            **future**
 #
