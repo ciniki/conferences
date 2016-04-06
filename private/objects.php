@@ -43,6 +43,7 @@ function ciniki_conferences_objects($ciniki) {
 		'fields'=>array(
 			'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
 			'customer_id'=>array('name'=>'Customer', 'ref'=>'ciniki.customers.customer'),
+			'presentation_number'=>array('name'=>'Type', 'default'=>'0'),
 			'presentation_type'=>array('name'=>'Type'),
 			'status'=>array('name'=>'Status', 'default'=>'10'),
 			'submission_date'=>array('name'=>'Submission Date'),
@@ -50,6 +51,21 @@ function ciniki_conferences_objects($ciniki) {
 			'title'=>array('name'=>'Title'),
 			'permalink'=>array('name'=>'Permalink'),
 			'description'=>array('name'=>'Description', 'default'=>''),
+			),
+		'history_table'=>'ciniki_conferences_history',
+		);
+	$objects['presentationreview'] = array(
+		'name'=>'Presentation Review',
+        'o_name'=>'presentationreview',
+        'o_container'=>'presentationreviews',
+		'sync'=>'yes',
+		'table'=>'ciniki_conferences_presentation_reviews',
+		'fields'=>array(
+			'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+			'presentation_id'=>array('name'=>'Presentation', 'ref'=>'ciniki.conferences.presentation'),
+			'customer_id'=>array('name'=>'Reviewer', 'ref'=>'ciniki.customers.customer'),
+			'vote'=>array('name'=>'Vote', 'default'=>'0'),
+			'notes'=>array('name'=>'Notes', 'default'=>''),
 			),
 		'history_table'=>'ciniki_conferences_history',
 		);

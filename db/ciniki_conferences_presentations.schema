@@ -13,12 +13,14 @@
 #
 # customer_id:          The ID of the customer who submitted the presentation
 #
+# presentation_number:  The unique number assigned to each presentation for a conference.
+#
 # presentation_type:    The type of presentation
 #
 #                       10 - Individual Paper
 #                       20 - Panel
 #
-# status:               The current status of the conference.
+# status:               The current status of the presentation.
 #
 #                       10 - Submitted
 #                       30 - Accepted
@@ -44,6 +46,7 @@ create table ciniki_conferences_presentations (
     business_id int not null,
     conference_id int not null,
     customer_id int not null,
+    presentation_number varchar(12) not null,
     presentation_type tinyint unsigned not null,
     status tinyint unsigned not null,
     submission_date datetime not null,

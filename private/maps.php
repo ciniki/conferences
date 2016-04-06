@@ -32,6 +32,12 @@ function ciniki_conferences_maps($ciniki) {
             '30'=>'Accepted',
             '50'=>'Rejected',
 		));
+	$maps['presentationreview'] = array(
+        'vote'=>array(
+            '0'=>'Undecided',
+            '50'=>'Accept',
+            '100'=>'Reject',
+		));
 
 	return array('stat'=>'ok', 'maps'=>$maps);
 }
