@@ -54,6 +54,7 @@ function ciniki_conferences_presentationList($ciniki) {
         . "ciniki_conferences_presentations.conference_id, "
         . "ciniki_conferences_presentations.customer_id, "
         . "ciniki_customers.display_name, "
+        . "ciniki_conferences_presentations.presentation_number, "
         . "ciniki_conferences_presentations.presentation_type, "
         . "ciniki_conferences_presentations.status, "
         . "ciniki_conferences_presentations.status AS status_text, "
@@ -76,7 +77,7 @@ function ciniki_conferences_presentationList($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'presentations', 'fname'=>'id', 
-            'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 
+            'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_number', 'presentation_type', 
                 'status', 'status_text', 'submission_date', 'field', 'title', 'display_name', 'permalink', 'description'),
              'maps'=>array(
                 'status_text'=>$maps['presentation']['status'],
@@ -87,6 +88,9 @@ function ciniki_conferences_presentationList($ciniki) {
     }
     if( isset($rc['presentations']) ) {
         $presentations = $rc['presentations'];
+        foreach($presentations as $pid => $presentation) {
+            $presentations[$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
+        }
     } else {
         $presentations = array();
     }

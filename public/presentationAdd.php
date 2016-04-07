@@ -68,6 +68,10 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
 	}
 
     //
+    // FIXME: Get the next presentation_number
+    //
+
+    //
     // Start transaction
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');

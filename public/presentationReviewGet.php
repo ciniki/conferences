@@ -118,6 +118,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
             . "ciniki_conferences_presentations.conference_id, "
             . "ciniki_conferences_presentations.customer_id, "
             . "ciniki_customers.display_name, "
+            . "ciniki_conferences_presentations.presentation_number, "
             . "ciniki_conferences_presentations.presentation_type, "
             . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
             . "ciniki_conferences_presentations.status, "
@@ -136,7 +137,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
             array('container'=>'presentations', 'fname'=>'id', 
-                'fields'=>array('id', 'conference_id', 'display_name', 'customer_id', 'presentation_type', 'presentation_type_text',
+                'fields'=>array('id', 'conference_id', 'display_name', 'customer_id', 'presentation_number', 'presentation_type', 'presentation_type_text',
                     'status', 'status_text', 'submission_date', 'field', 'title'),
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
@@ -153,7 +154,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
         }
         $presentation = $rc['presentations'][0];
         $presentationreview['presentation_details'] = array(
-            array('label'=>'Title', 'value'=>$presentation['title']),
+            array('label'=>'Title', 'value'=>sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title']),
             array('label'=>'Field', 'value'=>$presentation['field']),
             array('label'=>'Presenter', 'value'=>$presentation['display_name']),
             );

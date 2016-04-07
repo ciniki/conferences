@@ -70,6 +70,7 @@ function ciniki_conferences_presentationGet($ciniki) {
         $presentation = array('id'=>0,
             'conference_id'=>'',
             'customer_id'=>'',
+            'presentation_number'=>'',
             'presentation_type'=>'',
             'status'=>'10',
             'submission_date'=>'',
@@ -88,6 +89,7 @@ function ciniki_conferences_presentationGet($ciniki) {
             . "ciniki_conferences_presentations.conference_id, "
             . "ciniki_conferences_presentations.customer_id, "
             . "ciniki_customers.display_name, "
+            . "ciniki_conferences_presentations.presentation_number, "
             . "ciniki_conferences_presentations.presentation_type, "
             . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
             . "ciniki_conferences_presentations.status, "
@@ -108,7 +110,7 @@ function ciniki_conferences_presentationGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
             array('container'=>'presentations', 'fname'=>'id', 
-                'fields'=>array('id', 'conference_id', 'customer_id', 'display_name', 'presentation_type', 'presentation_type_text',
+                'fields'=>array('id', 'conference_id', 'customer_id', 'display_name', 'presentation_number', 'presentation_type', 'presentation_type_text',
                     'status', 'status_text', 'submission_date', 'field', 'title', 'permalink', 'description'),
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
@@ -124,6 +126,23 @@ function ciniki_conferences_presentationGet($ciniki) {
             return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3082', 'msg'=>'Unable to find Presentation'));
         }
         $presentation = $rc['presentations'][0];
+        $presentation['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
+
+        //
+        // Get the customer details
+        //
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
+		$rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
+            array('customer_id'=>$presentation['customer_id'], 'phones'=>'yes', 'emails'=>'yes', 'addresses'=>'no', 'subscriptions'=>'no', 'full_bio'=>'yes'));
+		if( $rc['stat'] != 'ok' ) {
+			return $rc;
+		}
+		$presentation['customer_details'] = $rc['details'];
+        if( isset($rc['customer']['full_bio']) ) {
+            $presentation['full_bio'] = $rc['customer']['full_bio'];
+        } else {
+            $presentation['full_bio'] = '';
+        }
 
         //
         // Lookup reviews

@@ -161,6 +161,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "ciniki_conferences_presentations.conference_id, "
                 . "ciniki_conferences_presentations.customer_id, "
                 . "ciniki_customers.display_name, "
+                . "ciniki_conferences_presentations.presentation_number, "
                 . "ciniki_conferences_presentations.presentation_type, "
                 . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
                 . "ciniki_conferences_presentations.status, "
@@ -169,11 +170,16 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "ciniki_conferences_presentations.field, "
                 . "ciniki_conferences_presentations.title, "
                 . "ciniki_conferences_presentations.permalink, "
-                . "ciniki_conferences_presentations.description "
+                . "IF(ciniki_conferences_presentation_reviews.vote > 0, 'yes', 'no') AS voted, "
+                . "COUNT(ciniki_conferences_presentation_reviews.id) AS num_votes "
                 . "FROM ciniki_conferences_presentations "
                 . "LEFT JOIN ciniki_customers ON ("
                     . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
                     . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . ") "
+                . "LEFT JOIN ciniki_conferences_presentation_reviews ON ("
+                    . "ciniki_conferences_presentations.id = ciniki_conferences_presentation_reviews.presentation_id "
+                    . "AND ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                     . ") "
                 . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                 . "";
@@ -183,22 +189,38 @@ function ciniki_conferences_conferenceGet($ciniki) {
             if( isset($args['presentation_type']) && $args['presentation_type'] > 0 ) {
                 $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
             }
+            $strsql .= "GROUP BY ciniki_conferences_presentations.id, voted ";
             $strsql .= "ORDER BY submission_date ";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'presentations', 'fname'=>'id', 
-                    'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 
-                        'status', 'status_text', 'submission_date', 'field', 'title', 'display_name', 'permalink', 'description'),
+                    'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 'presentation_number',
+                        'status', 'status_text', 'submission_date', 'field', 'title', 'display_name', 'permalink'),
                      'utctotz'=>array('submission_date'=>array('format'=>'M j', 'timezone'=>$intl_timezone)),
                      'maps'=>array(
                         'status_text'=>$maps['presentation']['status'],
                         'presentation_type_text'=>$maps['presentation']['presentation_type'],
                      )),
+                array('container'=>'voted', 'fname'=>'voted', 'fields'=>array('voted', 'num_votes')),
                 ));
             if( $rc['stat'] != 'ok' ) {
                 return $rc;
             }
             if( isset($rc['presentations']) ) {
                 $conference['presentations'] = $rc['presentations'];
+                foreach($conference['presentations'] as $pid => $presentation) {
+                    $conference['presentations'][$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
+                    $conference['presentations'][$pid]['votes_received'] = 0;
+                    $conference['presentations'][$pid]['total_reviews'] = 0;
+                    if( isset($presentation['voted']) ) {
+                        foreach($presentation['voted'] as $vote) {
+                            $conference['presentations'][$pid]['total_reviews'] += $vote['num_votes'];
+                            if( $vote['voted'] == 'yes' ) {
+                                $conference['presentations'][$pid]['votes_received'] += $vote['num_votes'];
+                            }
+                        }
+                        unset($conference['presentations'][$pid]['voted']);
+                    }
+                }
             } else {
                 $conference['presentations'] = array();
             }

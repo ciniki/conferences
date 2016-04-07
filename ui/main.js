@@ -66,20 +66,25 @@ function ciniki_conferences_main() {
                     'papers':{'label':'Papers', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","papers");'},
                     'panels':{'label':'Panels', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","panels");'},
                 }},
-            'presentations':{'label':'Presentations', 'type':'simplegrid', 'num_cols':2, 
+            'presentations':{'label':'Presentations', 'type':'simplegrid', 'num_cols':3, 
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
-                'cellClasses':['multiline', 'multiline'],
+                'sortable':'yes',
+                'sortTypes':['altnumber', 'altnumber', 'altnumber'],
+                'headerValues':['Title', 'Reviews', 'Status'],
+                'cellClasses':['multiline', 'multiline', 'multiline'],
                 'noData':'No Submissions',
                 },
 			'cfplogs':{'label':'Call For Proposals', 'type':'simplegrid', 'num_cols':2,
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='cfplogs'?'yes':'no';},
                 'cellClasses':['multiline', ''],
+                'headerValues':['Name', 'Date'],
                 'noData':'No Call For Proposals',
                 'addTxt':'Add Call For Proposal',
                 'addFn':'M.ciniki_conferences_main.cfplogEdit(\'M.ciniki_conferences_main.conferenceShow();\',M.ciniki_conferences_main.conference.conference_id,0);',
             },
 			'reviewers':{'label':'Reviewers', 'type':'simplegrid', 'num_cols':2,
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='reviewers'?'yes':'no';},
+                'headerValues':['Name', 'Votes'],
                 'cellClasses':['', ''],
                 'noData':'No Reviewers',
             },
@@ -98,16 +103,19 @@ function ciniki_conferences_main() {
 		this.conference.listValue = function(s, i, d) {
             return this.data[i];
 		};
-        this.conference.headerValue = function(s, i, d) {
-            if( s == 'cfplogs' ) {
-                switch (i) {
-                    case 0: return 'Name';
-                    case 1: return 'Date';
+        this.conference.cellSortValue = function(s, i, j, d) {
+            if( s == 'presentations' ) {
+                switch(j) {
+                    case 0: return d.presentation_number;
+                    case 1: 
+                        if( d.total_reviews == 0 ) { return 0; }
+                        return Math.floor((parseInt(d.votes_received)/parseInt(d.total_reviews)) * 10)+parseInt(d.total_reviews);
+                    case 2: return d.status;
                 }
             }
         };
-        this.conference.cellClass = function(s, i, j, d) {
-            if( s == 'reviewers' && j == 1 ) {
+        this.conference.rowClass = function(s, i, d) {
+            if( s == 'reviewers' ) {
                 if( d.votes_received < d.total_reviews ) {
                     if( d.votes_received > 0 ) {
                         return 'statusorange';
@@ -133,8 +141,9 @@ function ciniki_conferences_main() {
                 }
             } else if( s == 'presentations' ) {
                 switch (j) {
-                    case 0: return '<span class="maintext">' + d.title + '</span><span class="subtext">' + d.display_name + '</span>';
-                    case 1: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.submission_date + '</span>';
+                    case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+                    case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + '</span>';
+                    case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.submission_date + '</span>';
                 }
             }
         };
@@ -147,15 +156,15 @@ function ciniki_conferences_main() {
                     case '30': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","accepted");';
                     case '50': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","rejected");';
                 }
-//                return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'status\':\'' + i + '\'});';
             } else if( s == 'presentation_types' ) {
                 switch(i) {
                     case '10': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","papers");';
                     case '20': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","panels");';
                 }
-//                return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'type\':\'' + i + '\'});';
             } else if( s == 'presentations' ) {
                 return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'presentation_id\':\'' + d.id + '\'});';
+            } else if( s == 'reviewers' ) {
+                return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'reviewer_id\':\'' + d.customer_id + '\'});';
             }
         };
         this.conference.addButton('edit', 'Edit', 'M.ciniki_conferences_main.conferenceEdit(\'M.ciniki_conferences_main.conferenceShow();\',M.ciniki_conferences_main.conference.conference_id);');

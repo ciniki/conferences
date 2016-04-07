@@ -55,13 +55,14 @@ function ciniki_conferences_presentations() {
 		this.presentation.presentation_id = 0;
 		this.presentation.sections = {
 			'info':{'label':'Presentation', 'list':{
-				'title':{'label':'Title'},
+				'display_title':{'label':'Title'},
 				'display_name':{'label':'Presenter'},
 				'status_text':{'label':'Status'},
 				'field':{'label':'Field'},
 				'presentation_type_text':{'label':'Type'},
 				'submission_date':{'label':'Submitted On'},
                 }},
+			'full_bio':{'label':'Bio', 'type':'html'},
 			'description':{'label':'Description', 'type':'html'},
             'reviews':{'label':'Reviewers', 'type':'simplegrid', 'num_cols':2,
                 'addTxt':'Add Reviewer',
@@ -74,6 +75,7 @@ function ciniki_conferences_presentations() {
 		this.presentation.sectionData = function(s) {
             if( s == 'info' ) { return this.sections[s].list; }
             if( s == 'description' ) { return this.data[s].replace(/\n/g, '<br/>'); }
+            if( s == 'full_bio' ) { return this.data[s].replace(/\n/g, '<br/>'); }
 			return this.data[s];
 		};
         this.presentation.noData = function(s) {
@@ -95,6 +97,15 @@ function ciniki_conferences_presentations() {
                 switch (j) {
                     case 0: return d.display_name;
                     case 1: return d.vote_text;
+                }
+            }
+        };
+        this.presentation.rowClass = function(s, i, d) {
+            if( s == 'reviews' ) {
+                switch(d.vote) {
+                    case '0': return 'statusorange';
+                    case '30': return 'statusgreen';
+                    case '50': return 'statusred';
                 }
             }
         };
@@ -143,20 +154,52 @@ function ciniki_conferences_presentations() {
 		//
 		this.reviewer = new M.panel('Reviewer',
 			'ciniki_conferences_presentations', 'reviewer',
-			'mc', 'medium mediumaside', 'sectioned', 'ciniki.conferences.presentations.reviewer');
+			'mc', 'medium', 'sectioned', 'ciniki.conferences.presentations.reviewer');
 		this.reviewer.data = null;
-		this.reviewer.presentation_id = 0;
+		this.reviewer.reviewer_id = 0;
+		this.reviewer.conference_id = 0;
         this.reviewer.sections = { 
-            'presentations':{'label':'Presentations', 'type':'simplegrid', 'num_cols':2,
-                },
-            };  
-		this.reviewer.fieldValue = function(s, i, d) { return this.data[i]; }
-		this.reviewer.fieldHistoryArgs = function(s, i) {
-			return {'method':'ciniki.conferences.presentationHistory', 'args':{'business_id':M.curBusinessID, 
-				'presentation_id':this.presentation_id, 'field':i}};
-		}
-		this.reviewer.addButton('save', 'Save', 'M.ciniki_conferences_presentations.presentationSave();');
-		this.reviewer.addClose('Cancel');
+			'customer_details':{'label':'Reviewer', 'type':'simplegrid', 'num_cols':2,
+				'cellClasses':['label',''],
+				},
+			'reviews':{'label':'Reviews', 'type':'simplegrid', 'num_cols':2,
+                'cellClasses':['multiline', 'multiline'],
+				'noData':'No presentations',
+				},
+			'_buttons':{'label':'', 'buttons':{
+                'downloadpdf':{'label':'Download PDF', 'fn':'M.ciniki_conferences_presentations.reviewerPDF();'},
+                }},
+			};
+		this.reviewer.sectionData = function(s) { return this.data[s]; }
+		this.reviewer.noData = function(s) { return this.sections[s].noData; }
+		this.reviewer.cellValue = function(s, i, j, d) {
+            if( s == 'customer_details' ) {
+                switch (j) {
+                    case 0: return d.detail.label;
+                    case 1: return d.detail.value.replace(/\n/g, '<br/>');
+                }
+            } else if( s == 'reviews' ) {
+                switch(j) {
+                    case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+                    case 1: return d.vote_text;
+                }
+            }
+		};
+        this.reviewer.rowClass = function(s, i, d) {
+            if( s == 'reviews' ) {
+                switch(d.vote) {
+                    case '0': return 'statusorange';
+                    case '30': return 'statusgreen';
+                    case '50': return 'statusred';
+                }
+            }
+        };
+		this.reviewer.rowFn = function(s, i, d) {
+            if( s == 'reviews' ) {
+                return 'M.ciniki_conferences_presentations.reviewEdit(\'M.ciniki_conferences_presentations.reviewerShow();\',\'' + d.id + '\');';
+            }
+		};
+		this.reviewer.addClose('Back');
 
         //
         // The panel for changing and individual review
@@ -225,7 +268,7 @@ function ciniki_conferences_presentations() {
 		}
 
         if( args.reviewer_id != null ) {
-            this.reviewerShow(cb, args.reviewer_id);
+            this.reviewerShow(cb, args.reviewer_id, args.conference_id);
         } else if( args.review_id != null ) {
             this.reviewEdit(cb, args.review_id);
         } else if( args.presentation_id != null ) {
@@ -363,6 +406,30 @@ function ciniki_conferences_presentations() {
 					M.ciniki_conferences_presentations.edit.close();
 				});
 		}
+	};
+
+    //
+    // Reviewer functions
+    //
+	this.reviewerShow = function(cb, rid, cid) {
+		if( rid != null ) { this.reviewer.reviewer_id = rid; }
+		if( cid != null ) { this.reviewer.conference_id = cid; }
+		M.api.getJSONCb('ciniki.conferences.presentationReviewerGet', {'business_id':M.curBusinessID, 
+            'reviewer_id':this.reviewer.reviewer_id, 'conference_id':this.reviewer.conference_id}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                var p = M.ciniki_conferences_presentations.reviewer;
+                p.data = rsp.reviewer;
+                p.refresh();
+                p.show(cb);
+            });
+	};
+
+	this.reviewerPDF = function(cb) {
+		M.api.openFile('ciniki.conferences.presentationReviewerPDF', {'business_id':M.curBusinessID, 
+            'reviewer_id':this.reviewer.reviewer_id, 'conference_id':this.reviewer.conference_id});
 	};
 
     //
