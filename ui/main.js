@@ -80,7 +80,7 @@ function ciniki_conferences_main() {
             },
 			'reviewers':{'label':'Reviewers', 'type':'simplegrid', 'num_cols':2,
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='reviewers'?'yes':'no';},
-                'cellClasses':['multiline', 'multiline'],
+                'cellClasses':['', ''],
                 'noData':'No Reviewers',
             },
 		};
@@ -106,6 +106,18 @@ function ciniki_conferences_main() {
                 }
             }
         };
+        this.conference.cellClass = function(s, i, j, d) {
+            if( s == 'reviewers' && j == 1 ) {
+                if( d.votes_received < d.total_reviews ) {
+                    if( d.votes_received > 0 ) {
+                        return 'statusorange';
+                    } 
+                    return 'statusred';
+                }
+                return 'statusgreen';
+            }
+            return '';
+        };
         this.conference.cellValue = function(s, i, j, d) {
             if( s == 'presentation_stats' || s == 'presentation_types' ) {
                 return d.name + ' <span class="count">' + d.count + '</span>'; 
@@ -113,6 +125,11 @@ function ciniki_conferences_main() {
                 switch (j) {
                     case 0: return '<span class="maintext">' + d.name + '</span><span class="subtext">' + d.email + ((d.email!=''&&d.url!='')?'/':'') + d.url + '</span>';
                     case 1: return d.sent_date;
+                }
+            } else if( s == 'reviewers' ) {
+                switch (j) {
+                    case 0: return '<span class="maintext">' + d.display_name + '</span><span class="subtext">' + '</span>';
+                    case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + '</span>';
                 }
             } else if( s == 'presentations' ) {
                 switch (j) {
@@ -239,7 +256,9 @@ function ciniki_conferences_main() {
             }
         }
         var args = {'business_id':M.curBusinessID, 'conference_id':this.conference.conference_id};
-        if( this.conference.sections._tabs.selected == 'presentations' ) {
+        if( this.conference.sections._tabs.selected == 'reviewers' ) {
+            args['reviewers'] = 'yes';
+        } else if( this.conference.sections._tabs.selected == 'presentations' ) {
             args['presentations'] = 'yes';
             switch (this.conference.sections._presentationtabs.selected) {
                 case 'submitted': args['presentation_status'] = 10; break;
