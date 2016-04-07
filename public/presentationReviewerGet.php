@@ -107,7 +107,7 @@ function ciniki_conferences_presentationReviewerGet($ciniki) {
             ),
         ));
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3188', 'msg'=>'Unable to get list of reviews', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3251', 'msg'=>'Unable to get list of reviews', 'err'=>$rc['err']));
     }
     if( isset($rc['reviews']) ) {
         $reviewer['reviews'] = $rc['reviews'];

@@ -93,10 +93,10 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'presentationreview');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3242', 'msg'=>'Presentation Review not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3247', 'msg'=>'Presentation Review not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['presentationreview']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3243', 'msg'=>'Unable to find Presentation Review'));
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3248', 'msg'=>'Unable to find Presentation Review'));
         }
         $presentationreview = $rc['presentationreview'];
 
@@ -147,10 +147,10 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
                  ),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3081', 'msg'=>'Presentation not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3249', 'msg'=>'Presentation not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['presentations'][0]) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3082', 'msg'=>'Unable to find Presentation'));
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3250', 'msg'=>'Unable to find Presentation'));
         }
         $presentation = $rc['presentations'][0];
         $presentationreview['presentation_details'] = array(
