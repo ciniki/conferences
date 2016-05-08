@@ -169,6 +169,11 @@ function ciniki_conferences_presentations() {
 			'_buttons':{'label':'', 'buttons':{
                 'downloadpdf':{'label':'Download PDF', 'fn':'M.ciniki_conferences_presentations.reviewerPDF();'},
                 }},
+            'messages':{'label':'Messages', 'visible':'yes', 'type':'simplegrid', 'num_cols':2,
+                'cellClasses':['multiline', 'multiline'],
+                'addTxt':'Email PDF to Reviewer',
+                'addFn':'M.ciniki_conferences_presentations.emailReviewerPDF(\'M.ciniki_conferences_presentations.reviewerShow();\',M.ciniki_conferences_presentations.reviewer.reviewer_id,M.ciniki_conferences_presentations.reviewer.conference_id);',
+                },
 			};
 		this.reviewer.sectionData = function(s) { return this.data[s]; }
 		this.reviewer.noData = function(s) { return this.sections[s].noData; }
@@ -182,6 +187,11 @@ function ciniki_conferences_presentations() {
                 switch(j) {
                     case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
                     case 1: return d.vote_text;
+                }
+            } else if( s == 'messages' ) {
+                switch(j) {
+                    case 0: return '<span class="maintext">' + d.message.status_text + '</span><span class="subtext">' + d.message.date_sent + '</span>';
+                    case 1: return '<span class="maintext">' + d.message.customer_email + '</span><span class="subtext">' + d.message.subject + '</span>';
                 }
             }
 		};
@@ -200,6 +210,31 @@ function ciniki_conferences_presentations() {
             }
 		};
 		this.reviewer.addClose('Back');
+
+		//
+		// The edit invoice panel
+		//
+		this.revieweremail = new M.panel('Email Reviewer PDF',
+			'ciniki_conferences_presentations', 'revieweremail',
+			'mc', 'medium', 'sectioned', 'ciniki.conferences.presentations.revieweremail');
+		this.revieweremail.reviewer_id = 0;
+		this.revieweremail.conference_id = 0;
+		this.revieweremail.data = {};
+		this.revieweremail.sections = {
+			'_subject':{'label':'', 'fields':{
+				'subject':{'label':'Subject', 'type':'text', 'history':'no'},
+				}},
+			'_textmsg':{'label':'Message', 'fields':{
+				'textmsg':{'label':'', 'hidelabel':'yes', 'type':'textarea', 'size':'large', 'history':'no'},
+				}},
+			'_buttons':{'label':'', 'buttons':{
+				'send':{'label':'Send', 'fn':'M.ciniki_conferences_presentations.sendReviewerEmail();'},
+				}},
+		};
+		this.revieweremail.fieldValue = function(s, i, d) {
+			return this.data[i];
+		};
+		this.revieweremail.addClose('Cancel');
 
         //
         // The panel for changing and individual review
@@ -414,7 +449,7 @@ function ciniki_conferences_presentations() {
 	this.reviewerShow = function(cb, rid, cid) {
 		if( rid != null ) { this.reviewer.reviewer_id = rid; }
 		if( cid != null ) { this.reviewer.conference_id = cid; }
-		M.api.getJSONCb('ciniki.conferences.presentationReviewerGet', {'business_id':M.curBusinessID, 
+		M.api.getJSONCb('ciniki.conferences.reviewerGet', {'business_id':M.curBusinessID, 
             'reviewer_id':this.reviewer.reviewer_id, 'conference_id':this.reviewer.conference_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -428,8 +463,38 @@ function ciniki_conferences_presentations() {
 	};
 
 	this.reviewerPDF = function(cb) {
-		M.api.openFile('ciniki.conferences.presentationReviewerPDF', {'business_id':M.curBusinessID, 
+		M.api.openFile('ciniki.conferences.reviewerPDF', {'business_id':M.curBusinessID, 
             'reviewer_id':this.reviewer.reviewer_id, 'conference_id':this.reviewer.conference_id});
+	};
+
+	this.emailReviewerPDF = function(cb, rid, cid) {
+		this.revieweremail.reviewer_id = rid;
+		this.revieweremail.conference_id = cid;
+		if( M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'] != null ) {
+            this.revieweremail.data.subject = M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'];
+		} else {
+			this.revieweremail.data.subject = 'Conference submissions for your review';
+		}
+		if( M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'] != null ) {
+            this.revieweremail.data.textmsg = M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'];
+		} else {
+			this.revieweremail.data.textmsg = 'Please review the following submissions and let us know which you thing are approriate.';
+		}
+		this.revieweremail.refresh();
+		this.revieweremail.show(cb);
+	};
+
+	this.sendReviewerEmail = function() {
+		var subject = this.revieweremail.formFieldValue(this.revieweremail.sections._subject.fields.subject, 'subject');
+		var textmsg = this.revieweremail.formFieldValue(this.revieweremail.sections._textmsg.fields.textmsg, 'textmsg');
+		M.api.getJSONCb('ciniki.conferences.reviewerPDF', {'business_id':M.curBusinessID, 
+			'reviewer_id':this.revieweremail.reviewer_id, 'conference_id':this.revieweremail.conference_id, 'subject':subject, 'content':textmsg, 'output':'pdf', 'email':'yes'}, function(rsp) {
+				if( rsp.stat != 'ok' ) {
+					M.api.err(rsp);
+					return false;
+				}
+				M.ciniki_conferences_presentations.revieweremail.close();
+			});
 	};
 
     //

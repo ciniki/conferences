@@ -14,7 +14,7 @@
 // Returns
 // -------
 //
-function ciniki_conferences_presentationReviewerGet($ciniki) {
+function ciniki_conferences_reviewerGet($ciniki) {
     //
     // Find all the required and optional arguments
     //
@@ -34,7 +34,7 @@ function ciniki_conferences_presentationReviewerGet($ciniki) {
     // check permission to run this function for this business
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.presentationReviewerGet');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.reviewerGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -117,6 +117,20 @@ function ciniki_conferences_presentationReviewerGet($ciniki) {
     } else {
         $reviewer['reviews'] = array();
     }
+
+    //
+    // Check for any messages sent
+    //
+	if( isset($ciniki['business']['modules']['ciniki.mail']) ) {
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'mail', 'hooks', 'objectMessages');
+		$rc = ciniki_mail_hooks_objectMessages($ciniki, $args['business_id'], array('object'=>'ciniki.conferences.conferencereviewer', 'object_id'=>$args['conference_id'] . '-' . $args['reviewer_id']));
+		if( $rc['stat'] != 'ok' ) {
+			return $rc;
+		}
+		if( isset($rc['messages']) ) {
+			$reviewer['messages'] = $rc['messages'];
+		}
+	} 
 
     return array('stat'=>'ok', 'reviewer'=>$reviewer);
 }
