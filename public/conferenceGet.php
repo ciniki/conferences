@@ -77,6 +77,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
     //
     // Return default for new Conference
     //
+    $email_list = '';
     if( $args['conference_id'] == 0 ) {
         $conference = array('id'=>0,
             'name'=>'',
@@ -220,9 +221,48 @@ function ciniki_conferences_conferenceGet($ciniki) {
                         }
                         unset($conference['presentations'][$pid]['voted']);
                     }
+
                 }
             } else {
                 $conference['presentations'] = array();
+            }
+
+            //
+            // Get the email list
+            //
+            $strsql = "SELECT ciniki_conferences_presentations.id, "
+                . "ciniki_conferences_presentations.conference_id, "
+                . "ciniki_conferences_presentations.customer_id, "
+                . "ciniki_customers.display_name, "
+                . "ciniki_customer_emails.email "
+                . "FROM ciniki_conferences_presentations "
+                . "LEFT JOIN ciniki_customers ON ("
+                    . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+                    . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . ") "
+                . "LEFT JOIN ciniki_customer_emails ON ("
+                    . "ciniki_customers.id = ciniki_customer_emails.customer_id "
+                    . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . ") "
+                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "";
+            if( isset($args['presentation_status']) && $args['presentation_status'] > 0 ) {
+                $strsql .= "AND ciniki_conferences_presentations.status = '" . ciniki_core_dbQuote($ciniki, $args['presentation_status']) . "' ";
+            }
+            if( isset($args['presentation_type']) && $args['presentation_type'] > 0 ) {
+                $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
+            }
+            $strsql .= "ORDER BY submission_date ";
+            $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
+                array('container'=>'emails', 'fname'=>'id', 'fields'=>array('id', 'customer_id', 'display_name', 'email')),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            if( isset($rc['emails']) ) {
+                foreach($rc['emails'] as $email) {
+                    $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $email['display_name'] . '" ' . $email['email'];
+                }
             }
         }
 
@@ -321,6 +361,6 @@ function ciniki_conferences_conferenceGet($ciniki) {
         }
     }
 
-    return array('stat'=>'ok', 'conference'=>$conference);
+    return array('stat'=>'ok', 'conference'=>$conference, 'emails'=>$email_list);
 }
 ?>

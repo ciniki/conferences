@@ -54,6 +54,7 @@ function ciniki_conferences_presentationList($ciniki) {
         . "ciniki_conferences_presentations.conference_id, "
         . "ciniki_conferences_presentations.customer_id, "
         . "ciniki_customers.display_name, "
+        . "ciniki_customer_emails.email, "
         . "ciniki_conferences_presentations.presentation_number, "
         . "ciniki_conferences_presentations.presentation_type, "
         . "ciniki_conferences_presentations.status, "
@@ -67,6 +68,10 @@ function ciniki_conferences_presentationList($ciniki) {
         . "LEFT JOIN ciniki_customers ON ("
             . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
             . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . ") "
+        . "LEFT JOIN ciniki_customer_emails ON ("
+            . "ciniki_customers.id = ciniki_customer_emails.id "
+            . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "";
@@ -86,15 +91,17 @@ function ciniki_conferences_presentationList($ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
+    $email_list = '';
     if( isset($rc['presentations']) ) {
         $presentations = $rc['presentations'];
         foreach($presentations as $pid => $presentation) {
             $presentations[$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
+            $email_list .= ($email_list != '' ? ', ' : '') . '"' . $presentation['display_name'] . '" ' . $presentation['email'];
         }
     } else {
         $presentations = array();
     }
 
-    return array('stat'=>'ok', 'presentations'=>$presentations);
+    return array('stat'=>'ok', 'presentations'=>$presentations, 'emails'=>$email_list);
 }
 ?>

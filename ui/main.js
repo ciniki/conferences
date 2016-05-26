@@ -74,6 +74,9 @@ function ciniki_conferences_main() {
                 'cellClasses':['multiline', 'multiline', 'multiline'],
                 'noData':'No Submissions',
                 },
+            'emails':{'label':'Emails', 'type':'html',
+                'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
+                },
 			'cfplogs':{'label':'Call For Proposals', 'type':'simplegrid', 'num_cols':2,
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='cfplogs'?'yes':'no';},
                 'cellClasses':['multiline', ''],
@@ -91,6 +94,7 @@ function ciniki_conferences_main() {
 		};
 		this.conference.sectionData = function(s) {
             if( s == 'info' ) { return this.sections[s].list; }
+            if( s == 'emails' ) { return this.data[s].replace(/\n/g, '<br/>'); }
 			return this.data[s];
 		};
         this.conference.noData = function(s) {
@@ -287,6 +291,7 @@ function ciniki_conferences_main() {
             }
             var p = M.ciniki_conferences_main.conference;
             p.data = rsp.conference;
+            p.data.emails = rsp.emails;
             p.refresh();
             p.show(cb);
         });
