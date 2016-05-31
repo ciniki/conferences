@@ -66,6 +66,13 @@ function ciniki_conferences_main() {
                     'papers':{'label':'Papers', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","papers");'},
                     'panels':{'label':'Panels', 'fn':'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","panels");'},
                 }},
+            'presentationsearch':{'label':'', 'type':'livesearchgrid', 'livesearchcols':3,
+                'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
+                'hint':'search customer or presentation name',
+                'noData':'No presentations found',
+                'headerValues':['Title', 'Reviews', 'Status'],
+                'cellClasses':['multiline', 'multiline', 'multiline'],
+                },
             'presentations':{'label':'Presentations', 'type':'simplegrid', 'num_cols':3, 
                 'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
                 'sortable':'yes',
@@ -128,7 +135,7 @@ function ciniki_conferences_main() {
                 }
                 return 'statusgreen';
             }
-            if( s == 'presentations' ) {
+            if( s == 'presentations' || s == 'presentationsearch' ) {
                 if( d.status == 50 || d.registration == 50 ) { return 'statusred'; }
                 else if( d.status == 30 && d.registration == 30 ) { return 'statusgreen'; }
                 else if( d.status == 30 && d.registration < 10 ) { return 'statusgrey'; }
@@ -149,7 +156,7 @@ function ciniki_conferences_main() {
                     case 0: return '<span class="maintext">' + d.display_name + '</span><span class="subtext">' + '</span>';
                     case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + '</span>';
                 }
-            } else if( s == 'presentations' ) {
+            } else if( s == 'presentations' || s == 'presentationsearch' ) {
                 switch (j) {
                     case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
                     case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + d.submission_date + '</span>';
@@ -171,12 +178,24 @@ function ciniki_conferences_main() {
                     case '10': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","papers");';
                     case '20': return 'M.ciniki_conferences_main.conferenceShow(null,null,"presentations","panels");';
                 }
-            } else if( s == 'presentations' ) {
+            } else if( s == 'presentations' || s == 'presentationsearch' ) {
                 return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'presentation_id\':\'' + d.id + '\'});';
             } else if( s == 'reviewers' ) {
                 return 'M.startApp(\'ciniki.conferences.presentations\',null,\'M.ciniki_conferences_main.conferenceShow();\',\'mc\',{\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'conference_id\':M.ciniki_conferences_main.conference.conference_id,\'reviewer_id\':\'' + d.customer_id + '\'});';
             }
         };
+		this.conference.liveSearchCb = function(s, i, value) {
+			if( s == 'presentationsearch' && value != '' ) {
+				M.api.getJSONBgCb('ciniki.conferences.presentationSearch', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'start_needle':value, 'limit':'15'}, 
+					function(rsp) { 
+						M.ciniki_conferences_main.conference.liveSearchShow('presentationsearch', null, M.gE(M.ciniki_conferences_main.conference.panelUID + '_' + s), rsp.presentations); 
+					});
+				return true;
+			}
+		};
+		this.conference.liveSearchResultValue = function(s, f, i, j, d) { return this.cellValue(s, i, j, d); }
+		this.conference.liveSearchResultRowFn = function(s, f, i, j, d) { return this.rowFn(s, i, d); }
+		this.conference.liveSearchResultRowClass = function(s, f, i, d) { return this.rowClass(s, i, d); }
         this.conference.addButton('edit', 'Edit', 'M.ciniki_conferences_main.conferenceEdit(\'M.ciniki_conferences_main.conferenceShow();\',M.ciniki_conferences_main.conference.conference_id);');
 		this.conference.addClose('Back');
 
