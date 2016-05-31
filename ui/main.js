@@ -129,8 +129,9 @@ function ciniki_conferences_main() {
                 return 'statusgreen';
             }
             if( s == 'presentations' ) {
-                if( d.status == 50 || d.registration == 50 ) { return 'statusgrey'; }
+                if( d.status == 50 || d.registration == 50 ) { return 'statusred'; }
                 else if( d.status == 30 && d.registration == 30 ) { return 'statusgreen'; }
+                else if( d.status == 30 && d.registration < 10 ) { return 'statusgrey'; }
                 else if( d.status == 30 && d.registration < 30 ) { return 'statusorange'; }
             }
             return '';
