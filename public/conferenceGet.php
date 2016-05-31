@@ -167,6 +167,8 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
                 . "ciniki_conferences_presentations.status, "
                 . "ciniki_conferences_presentations.status AS status_text, "
+                . "ciniki_conferences_presentations.registration, "
+                . "ciniki_conferences_presentations.registration AS registration_text, "
                 . "ciniki_conferences_presentations.submission_date, "
                 . "ciniki_conferences_presentations.field, "
                 . "ciniki_conferences_presentations.title, "
@@ -195,10 +197,11 @@ function ciniki_conferences_conferenceGet($ciniki) {
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'presentations', 'fname'=>'id', 
                     'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 'presentation_number',
-                        'status', 'status_text', 'submission_date', 'field', 'title', 'display_name', 'permalink'),
+                        'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'display_name', 'permalink'),
                      'utctotz'=>array('submission_date'=>array('format'=>'M j', 'timezone'=>$intl_timezone)),
                      'maps'=>array(
                         'status_text'=>$maps['presentation']['status'],
+                        'registration_text'=>$maps['presentation']['registration'],
                         'presentation_type_text'=>$maps['presentation']['presentation_type'],
                      )),
                 array('container'=>'voted', 'fname'=>'voted', 'fields'=>array('voted', 'num_votes')),

@@ -1,0 +1,5 @@
+#
+# Upgrade to 1.02
+#
+ALTER TABLE ciniki_conferences_presentations ADD COLUMN registration tinyint unsigned not null AFTER status;
+ALTER TABLE ciniki_conferences_presentations COMMENT='v1.02';

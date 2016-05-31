@@ -73,6 +73,7 @@ function ciniki_conferences_presentationGet($ciniki) {
             'presentation_number'=>'',
             'presentation_type'=>'',
             'status'=>'10',
+            'registration'=>'0',
             'submission_date'=>'',
             'field'=>'',
             'title'=>'',
@@ -94,6 +95,8 @@ function ciniki_conferences_presentationGet($ciniki) {
             . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
             . "ciniki_conferences_presentations.status, "
             . "ciniki_conferences_presentations.status AS status_text, "
+            . "ciniki_conferences_presentations.registration, "
+            . "ciniki_conferences_presentations.registration AS registration_text, "
             . "ciniki_conferences_presentations.submission_date, "
             . "ciniki_conferences_presentations.field, "
             . "ciniki_conferences_presentations.title, "
@@ -111,10 +114,11 @@ function ciniki_conferences_presentationGet($ciniki) {
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
             array('container'=>'presentations', 'fname'=>'id', 
                 'fields'=>array('id', 'conference_id', 'customer_id', 'display_name', 'presentation_number', 'presentation_type', 'presentation_type_text',
-                    'status', 'status_text', 'submission_date', 'field', 'title', 'permalink', 'description'),
+                    'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'permalink', 'description'),
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
                     'status_text'=>$maps['presentation']['status'],
+                    'registration_text'=>$maps['presentation']['registration'],
                     ),
                 'utctotz'=>array('submission_date'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone)),
                  ),

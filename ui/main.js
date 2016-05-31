@@ -128,6 +128,11 @@ function ciniki_conferences_main() {
                 }
                 return 'statusgreen';
             }
+            if( s == 'presentations' ) {
+                if( d.status == 50 || d.registration == 50 ) { return 'statusgrey'; }
+                else if( d.status == 30 && d.registration == 30 ) { return 'statusgreen'; }
+                else if( d.status == 30 && d.registration < 30 ) { return 'statusorange'; }
+            }
             return '';
         };
         this.conference.cellValue = function(s, i, j, d) {
@@ -146,8 +151,8 @@ function ciniki_conferences_main() {
             } else if( s == 'presentations' ) {
                 switch (j) {
                     case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
-                    case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + '</span>';
-                    case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.submission_date + '</span>';
+                    case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + d.submission_date + '</span>';
+                    case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
                 }
             }
         };

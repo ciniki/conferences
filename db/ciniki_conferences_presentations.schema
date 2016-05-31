@@ -26,6 +26,14 @@
 #                       30 - Accepted
 #                       50 - Rejected
 #
+# registration:         The current status of their registration.
+#
+#                       0 - Unknown
+#                       10 - Will register
+#                       30 - Registered
+#                       50 - Not registering
+#                       
+#
 # submission_date:      The UTC date and time of the submission.
 #
 # field:                The field of study.
@@ -49,6 +57,7 @@ create table ciniki_conferences_presentations (
     presentation_number varchar(12) not null,
     presentation_type tinyint unsigned not null,
     status tinyint unsigned not null,
+    registration tinyint unsigned not null,
     submission_date datetime not null,
     field varchar(250) not null,
     title varchar(250) not null,
@@ -59,4 +68,4 @@ create table ciniki_conferences_presentations (
     primary key (id),
     unique index (uuid),
     index sync (business_id, uuid, last_updated)
-) ENGINE='InnoDB', COMMENT='v1.01';
+) ENGINE='InnoDB', COMMENT='v1.02';

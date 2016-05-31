@@ -58,6 +58,7 @@ function ciniki_conferences_presentations() {
 				'display_title':{'label':'Title'},
 				'display_name':{'label':'Presenter'},
 				'status_text':{'label':'Status'},
+				'registration_text':{'label':'Registration'},
 				'field':{'label':'Field'},
 				'presentation_type_text':{'label':'Type'},
 				'submission_date':{'label':'Submitted On'},
@@ -129,6 +130,7 @@ function ciniki_conferences_presentations() {
             'general':{'label':'Presentation', 'aside':'yes', 'fields':{
                 'title':{'label':'Title', 'type':'text'},
                 'status':{'label':'Status', 'type':'toggle', 'toggles':{'10':'Submitted', '30':'Accepted', '50':'Rejected'}},
+                'registration':{'label':'Registration', 'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}},
                 'field':{'label':'Field', 'type':'text'},
                 'presentation_type':{'label':'Type', 'type':'toggle', 'toggles':{'10':'Individual Paper', '20':'Panel'}},
                 }}, 
