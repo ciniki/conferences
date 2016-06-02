@@ -126,6 +126,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         if( $rc['stat'] != 'ok' ) {
             return $rc;
         }
+        $attendee = $rc['item'];
         if( !isset($rc['item']) ) {
             //
             // Add the attendee
@@ -152,7 +153,6 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
                 ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
                 return $rc;
             }
-            $attendee_id = $rc['id'];
         }
     }
 

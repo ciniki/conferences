@@ -59,7 +59,6 @@ function ciniki_conferences_objects($ciniki) {
 			'presentation_number'=>array('name'=>'Type', 'default'=>'0'),
 			'presentation_type'=>array('name'=>'Type'),
 			'status'=>array('name'=>'Status', 'default'=>'10'),
-			'registration'=>array('name'=>'Registration', 'default'=>'0'),
 			'submission_date'=>array('name'=>'Submission Date'),
 			'field'=>array('name'=>'Field of Study', 'default'=>''),
 			'title'=>array('name'=>'Title'),

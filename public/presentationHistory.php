@@ -45,6 +45,23 @@ function ciniki_conferences_presentationHistory($ciniki) {
         return $rc;
     }
 
+    if( $args['field'] == 'registration' ) {
+        $strsql = "SELECT ciniki_conferences_attendees.id "
+            . "FROM ciniki_conferences_presentations, ciniki_conferences_attendees "
+            . "WHERE ciniki_conferences_presentations.id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
+            . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
+            . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
+            . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "";
+        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'attendee');
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
+        return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.conferences', 'ciniki_conferences_history', $args['business_id'], 'ciniki_conferences_attendees', $rc['attendee']['id'], 'status'); 
+    }
+
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
     return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.conferences', 'ciniki_conferences_history', $args['business_id'], 'ciniki_conferences_presentations', $args['presentation_id'], $args['field']);
 }
