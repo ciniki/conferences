@@ -106,7 +106,7 @@ function ciniki_conferences_main() {
             'noData':'No Submissions',
             },
         'emails':{'label':'Emails', 'type':'html',
-            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
+            'visible':function() {return (M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations' || M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees')?'yes':'no';},
             },
         'cfplogs':{'label':'Call For Proposals', 'type':'simplegrid', 'num_cols':2,
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='cfplogs'?'yes':'no';},
@@ -184,7 +184,7 @@ function ciniki_conferences_main() {
             return d.name + ' <span class="count">' + d.count + '</span>'; 
         } else if( s == 'attendees' ) {
             switch (j) {
-                case 0: return '<span class="maintext">' + d.display_name + '</span><span class="subtext">' + d.emails + '</span>';
+                case 0: return '<span class="maintext">' + d.display_name + '</span><span class="subtext">' + d.company + '</span>';
                 case 1: return d.presenter;
                 case 2: return d.status_text;
             }

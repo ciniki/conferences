@@ -329,6 +329,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             $strsql = "SELECT ciniki_conferences_attendees.id, " 
                 . "ciniki_conferences_attendees.customer_id, "
                 . "ciniki_customers.display_name, "
+                . "ciniki_customers.company, "
                 . "ciniki_conferences_attendees.status, "
                 . "ciniki_conferences_attendees.status AS status_text, "
                 . "IFNULL(ciniki_customer_emails.email, '') AS emails, "
@@ -357,7 +358,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'attendees', 'fname'=>'id', 
-                    'fields'=>array('id', 'customer_id', 'display_name', 'status', 'status_text', 'emails', 'presenter'),
+                    'fields'=>array('id', 'customer_id', 'display_name', 'company', 'status', 'status_text', 'emails', 'presenter'),
                     'lists'=>array('emails'=>','),
                     'maps'=>array('status_text'=>$maps['attendee']['status']),
                     ),
@@ -367,8 +368,12 @@ function ciniki_conferences_conferenceGet($ciniki) {
             }
             if( isset($rc['attendees']) ) {
                 $conference['attendees'] = $rc['attendees'];
+                foreach($conference['attendees'] as $attendee) {
+                    $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $attendee['display_name'] . '" ' . $attendee['emails'];
+                }
             } else {
                 $conference['attendees'] = array();
+                $email_list = '';
             }
         }
 
