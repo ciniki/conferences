@@ -73,7 +73,7 @@ function ciniki_conferences_main() {
         'attendees':{'label':'Attendees', 'type':'simplegrid', 'num_cols':3, 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
             'sortable':'yes',
-            'sortTypes':['text', 'text', 'text'],
+            'sortTypes':['alttext', 'text', 'text'],
             'headerValues':['Name', 'Presenter', 'Status'],
             'cellClasses':['multiline', '', 'multiline'],
             'noData':'No attendees',
@@ -141,7 +141,7 @@ function ciniki_conferences_main() {
     this.conference.cellSortValue = function(s, i, j, d) {
         if( s == 'attendees' ) {
             switch(j) {
-                case 0: return d.display_name;
+                case 0: return d.sort_name;
                 case 1: return d.status;
             }
         }

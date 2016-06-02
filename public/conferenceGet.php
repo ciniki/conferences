@@ -329,6 +329,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             $strsql = "SELECT ciniki_conferences_attendees.id, " 
                 . "ciniki_conferences_attendees.customer_id, "
                 . "ciniki_customers.display_name, "
+                . "ciniki_customers.sort_name, "
                 . "ciniki_customers.company, "
                 . "ciniki_conferences_attendees.status, "
                 . "ciniki_conferences_attendees.status AS status_text, "
@@ -354,11 +355,11 @@ function ciniki_conferences_conferenceGet($ciniki) {
             if( isset($args['attendee_status']) && $args['attendee_status'] != '' ) {
                 $strsql .= "AND ciniki_conferences_attendees.status = '" . ciniki_core_dbQuote($ciniki, $args['attendee_status']) . "' ";
             }
-            $strsql .= "GROUP BY ciniki_customers.display_name, ciniki_customers.id "
-                . "";
+            $strsql .= "GROUP BY ciniki_customers.display_name, ciniki_customers.id ";
+            $strsql .= "ORDER BY ciniki_customers.sort_name ";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'attendees', 'fname'=>'id', 
-                    'fields'=>array('id', 'customer_id', 'display_name', 'company', 'status', 'status_text', 'emails', 'presenter'),
+                    'fields'=>array('id', 'customer_id', 'display_name', 'sort_name', 'company', 'status', 'status_text', 'emails', 'presenter'),
                     'lists'=>array('emails'=>','),
                     'maps'=>array('status_text'=>$maps['attendee']['status']),
                     ),
