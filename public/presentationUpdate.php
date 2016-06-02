@@ -43,25 +43,28 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
+    
+    //
+    // Check if item exists
+    //
+    $strsql = "SELECT id, customer_id, conference_id "
+        . "FROM ciniki_conferences_presentations "
+        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( !isset($rc['item']) ) {
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3093', 'msg'=>'Presentation does not exist'));
+    }
+    $item = $rc['item'];
 
     //
     // Check permalink if title is updated
     //
 	if( isset($args['title']) ) {
-        $strsql = "SELECT id, conference_id "
-            . "FROM ciniki_conferences_presentations "
-			. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-			. "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
-            . "";
-		$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
-		if( $rc['stat'] != 'ok' ) {
-			return $rc;
-		}
-        if( !isset($rc['item']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3093', 'msg'=>'Presentation does not exist'));
-        }
-        $item = $rc['presentation'];
-
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
 		$args['permalink'] = ciniki_core_makePermalink($ciniki, $args['title']);
 
@@ -104,6 +107,53 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
         return $rc;
+    }
+
+    //
+    // Check if registration set
+    // 
+    if( isset($args['registration']) && $args['registration'] != '' ) {
+        //
+        // Check if customer already exists in attendees
+        //
+        $strsql = "SELECT id, conference_id, customer_id, status "
+            . "FROM ciniki_conferences_attendees "
+            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $item['conference_id']) . "' "
+            . "AND customer_id = '" . ciniki_core_dbQuote($ciniki, isset($args['customer_id']) ? $args['customer_id'] : $item['customer_id']) . "' "
+            . "";
+        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        if( !isset($rc['item']) ) {
+            //
+            // Add the attendee
+            //
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
+            $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
+                'conference_id'=>$item['conference_id'],
+                'customer_id'=>(isset($args['customer_id']) ? $args['customer_id'] : $item['customer_id']),
+                'status'=>$args['registration'],
+                ), 0x04);
+            if( $rc['stat'] != 'ok' ) {
+                ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+                return $rc;
+            }
+            $attendee_id = $rc['id'];
+        } elseif( $attendee['status'] != $args['registration'] ) {
+            //
+            // Update the attendee
+            //
+            $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
+                'status'=>$args['registration'],
+                ), 0x04);
+            if( $rc['stat'] != 'ok' ) {
+                ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+                return $rc;
+            }
+            $attendee_id = $rc['id'];
+        }
     }
 
     //

@@ -34,6 +34,19 @@ function ciniki_conferences_objects($ciniki) {
 			),
 		'history_table'=>'ciniki_conferences_history',
 		);
+	$objects['attendee'] = array(
+		'name'=>'Attendee',
+        'o_name'=>'attendee',
+        'o_container'=>'attendees',
+		'sync'=>'yes',
+		'table'=>'ciniki_conferences_attendees',
+		'fields'=>array(
+			'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+			'customer_id'=>array('name'=>'Customer', 'ref'=>'ciniki.customers.customer'),
+			'status'=>array('name'=>'Status', 'default'=>'0'),
+			),
+		'history_table'=>'ciniki_conferences_history',
+		);
 	$objects['presentation'] = array(
 		'name'=>'Presentation',
         'o_name'=>'presentation',

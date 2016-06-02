@@ -96,6 +96,22 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     $presentation_id = $rc['id'];
 
     //
+    // Check if registration set
+    // 
+    if( isset($args['registration']) && $args['registration'] > 0 ) {
+        $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
+            'conference_id'=>$args['conference_id'],
+            'customer_id'=>$args['customer_id'],
+            'status'=>$args['registration'],
+            ), 0x04);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+            return $rc;
+        }
+        $presentation_id = $rc['id'];
+    }
+
+    //
     // Commit the transaction
     //
     $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.conferences');

@@ -22,6 +22,14 @@ function ciniki_conferences_maps($ciniki) {
             0x10=>'Open for proposals',
             0x20=>'Open for registrations',
 		));
+	$maps['attendee'] = array(
+        'status'=>array(
+            '0'=>'Unknown',
+            '10'=>'Will Register',
+            '30'=>'Registered',
+            '50'=>'Not Registering',
+            ),
+        );
 	$maps['presentation'] = array(
         'presentation_type'=>array(
             '10'=>'Individual Paper',
@@ -32,12 +40,12 @@ function ciniki_conferences_maps($ciniki) {
             '30'=>'Accepted',
             '50'=>'Rejected',
             ),
-        'registration'=>array(
-            '0'=>'Unknown',
-            '10'=>'Will Register',
-            '30'=>'Registered',
-            '50'=>'Not Registering',
-            ),
+//        'registration'=>array(
+//            '0'=>'Unknown',
+//            '10'=>'Will Register',
+//            '30'=>'Registered',
+//            '50'=>'Not Registering',
+//            ),
 		);
 	$maps['presentationreview'] = array(
         'vote'=>array(

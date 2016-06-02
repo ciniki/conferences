@@ -95,14 +95,18 @@ function ciniki_conferences_presentationGet($ciniki) {
             . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
             . "ciniki_conferences_presentations.status, "
             . "ciniki_conferences_presentations.status AS status_text, "
-            . "ciniki_conferences_presentations.registration, "
-            . "ciniki_conferences_presentations.registration AS registration_text, "
+            . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration, "
+            . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration_text, "
             . "ciniki_conferences_presentations.submission_date, "
             . "ciniki_conferences_presentations.field, "
             . "ciniki_conferences_presentations.title, "
             . "ciniki_conferences_presentations.permalink, "
             . "ciniki_conferences_presentations.description "
             . "FROM ciniki_conferences_presentations "
+            . "LEFT JOIN ciniki_conferences_attendees ON ("
+                . "ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
+                . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . ") "
             . "LEFT JOIN ciniki_customers ON ("
                 . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
                 . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
@@ -118,7 +122,7 @@ function ciniki_conferences_presentationGet($ciniki) {
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
                     'status_text'=>$maps['presentation']['status'],
-                    'registration_text'=>$maps['presentation']['registration'],
+                    'registration_text'=>$maps['attendee']['status'],
                     ),
                 'utctotz'=>array('submission_date'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone)),
                  ),
