@@ -53,15 +53,15 @@ function ciniki_conferences_presentationGet($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
     $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
     //
     // Return default for new Presentation
@@ -139,13 +139,13 @@ function ciniki_conferences_presentationGet($ciniki) {
         //
         // Get the customer details
         //
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
-		$rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
+        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
             array('customer_id'=>$presentation['customer_id'], 'phones'=>'yes', 'emails'=>'yes', 'addresses'=>'no', 'subscriptions'=>'no', 'full_bio'=>'yes'));
-		if( $rc['stat'] != 'ok' ) {
-			return $rc;
-		}
-		$presentation['customer_details'] = $rc['details'];
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        $presentation['customer_details'] = $rc['details'];
         if( isset($rc['customer']['full_bio']) ) {
             $presentation['full_bio'] = $rc['customer']['full_bio'];
         } else {

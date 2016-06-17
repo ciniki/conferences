@@ -127,14 +127,14 @@ function ciniki_conferences_CFPLogGet($ciniki) {
     // Get all the categories
     //
     if( isset($args['categories']) && $args['categories'] == 'yes' ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsList');
-		$rc = ciniki_core_tagsList($ciniki, 'ciniki.conferences', $args['business_id'], 'ciniki_conferences_cfplog_tags', 10);
-		if( $rc['stat'] != 'ok' ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2849', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
-		}
-		if( isset($rc['tags']) ) {
-			$rsp['categories'] = $rc['tags'];
-		}
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsList');
+        $rc = ciniki_core_tagsList($ciniki, 'ciniki.conferences', $args['business_id'], 'ciniki_conferences_cfplog_tags', 10);
+        if( $rc['stat'] != 'ok' ) {
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2849', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
+        }
+        if( isset($rc['tags']) ) {
+            $rsp['categories'] = $rc['tags'];
+        }
     }
 
     return $rsp;

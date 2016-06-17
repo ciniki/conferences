@@ -31,8 +31,8 @@
     this.cfplog.edit = function(cb, cid, lid) {
         if( cid != null ) { this.conference_id = cid; }
         if( lid != null ) { this.cfplog_id = lid; }
-		this.reset();
-		this.sections._buttons.buttons.delete.visible = (this.cfplog_id>0?'yes':'no');
+        this.reset();
+        this.sections._buttons.buttons.delete.visible = (this.cfplog_id>0?'yes':'no');
         M.api.getJSONCb('ciniki.conferences.CFPLogGet', {'business_id':M.curBusinessID, 
             'cfplog_id':this.cfplog_id,
             'categories':'yes',
@@ -54,21 +54,21 @@
             });
     };
     this.cfplog.save = function() {
-		if( this.cfplog_id > 0 ) {
-			var c = this.serializeForm('no');
-			if( c != '' ) {
-				M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
+        if( this.cfplog_id > 0 ) {
+            var c = this.serializeForm('no');
+            if( c != '' ) {
+                M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
                     } 
                     M.ciniki_conferences_main.edit.close();
                 });
-			} else {
-				this.close();
-			}
-		} else {
-			var c = this.serializeForm('yes');
+            } else {
+                this.close();
+            }
+        } else {
+            var c = this.serializeForm('yes');
             M.api.postJSONCb('ciniki.conferences.CFPLogAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -76,18 +76,18 @@
                     } 
                     M.ciniki_conferences_main.edit.close();
                 });
-		}
+        }
     };
-	this.cfplog.remove = function() {
-		if( confirm("Are you sure you want to remove this CFP?") ) {
-			M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id}, function(rsp) {
+    this.cfplog.remove = function() {
+        if( confirm("Are you sure you want to remove this CFP?") ) {
+            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.edit.close();
             });
-		}
-	};
+        }
+    };
     this.cfplog.addButton('save', 'Save', 'M.ciniki_conferences_main.cfplog.save();');
     this.cfplog.addClose('Cancel');

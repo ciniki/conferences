@@ -37,15 +37,15 @@ function ciniki_conferences_presentationList($ciniki) {
         return $rc;
     }
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
     //
     // Get the list of presentations

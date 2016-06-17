@@ -69,9 +69,9 @@ function ciniki_conferences_CFPLogDelete(&$ciniki) {
         return $rc;
     }
 
-	//
-	// Remove any tags
-	//
+    //
+    // Remove any tags
+    //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsDelete');
     $rc = ciniki_core_tagsDelete($ciniki, 'ciniki.conferences', 'tag', $args['business_id'],
         'ciniki_conferences_cfplog_tags', 'ciniki_conferences_history', 'cfplog_id', $args['cfplog_id']);

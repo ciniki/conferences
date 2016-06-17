@@ -89,13 +89,13 @@ function ciniki_conferences_attendeeGet($ciniki) {
     }
 
     if( $attendee['customer_id'] > 0 ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
-		$rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], array('customer_id'=>$attendee['customer_id'], 'phones'=>'yes', 'emails'=>'yes'));
-		if( $rc['stat'] != 'ok' ) {
-			return $rc;
-		}
-		$attendee['customer'] = $rc['customer'];
-		$attendee['customer_details'] = $rc['details'];
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
+        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], array('customer_id'=>$attendee['customer_id'], 'phones'=>'yes', 'emails'=>'yes'));
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        $attendee['customer'] = $rc['customer'];
+        $attendee['customer_details'] = $rc['details'];
     }
 
     return array('stat'=>'ok', 'attendee'=>$attendee);

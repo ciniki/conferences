@@ -46,27 +46,27 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
         return $rc;
     }
 
-	if( !isset($args['permalink']) || $args['permalink'] == '' ) {	
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
-		$args['permalink'] = ciniki_core_makePermalink($ciniki, $args['title']);
-	}
+    if( !isset($args['permalink']) || $args['permalink'] == '' ) {    
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
+        $args['permalink'] = ciniki_core_makePermalink($ciniki, $args['title']);
+    }
 
-	//
-	// Check the permalink doesn't already exist
-	//
-	$strsql = "SELECT id "
+    //
+    // Check the permalink doesn't already exist
+    //
+    $strsql = "SELECT id "
         . "FROM ciniki_conferences_presentations "
-		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' " 
-		. "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' " 
-		. "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
-		. "";
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'presentation');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	if( $rc['num_rows'] > 0 ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3091', 'msg'=>'You already have a presentation with this title, please choose another title.'));
-	}
+        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' " 
+        . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' " 
+        . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'presentation');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( $rc['num_rows'] > 0 ) {
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3091', 'msg'=>'You already have a presentation with this title, please choose another title.'));
+    }
 
     //
     // FIXME: Get the next presentation_number

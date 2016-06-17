@@ -64,28 +64,28 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     // Check permalink if title is updated
     //
-	if( isset($args['title']) ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
-		$args['permalink'] = ciniki_core_makePermalink($ciniki, $args['title']);
+    if( isset($args['title']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
+        $args['permalink'] = ciniki_core_makePermalink($ciniki, $args['title']);
 
-		//
-		// Make sure the permalink is unique
-		//
-		$strsql = "SELECT id, name, permalink "
+        //
+        // Make sure the permalink is unique
+        //
+        $strsql = "SELECT id, name, permalink "
             . "FROM ciniki_conferences_presentations "
-			. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-			. "AND conference_id = '" . ciniki_core_dbQuote($ciniki, (isset($args['conference_id'])?$args['conference_id']:$item['conference_id'])) . "' "
-			. "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
-			. "AND id <> '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
-			. "";
-		$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'presentation');
-		if( $rc['stat'] != 'ok' ) {
-			return $rc;
-		}
-		if( $rc['num_rows'] > 0 ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3077', 'msg'=>'You already have a presentation with this title, please choose another title.'));
-		}
-	}
+            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, (isset($args['conference_id'])?$args['conference_id']:$item['conference_id'])) . "' "
+            . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
+            . "AND id <> '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
+            . "";
+        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'presentation');
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        if( $rc['num_rows'] > 0 ) {
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3077', 'msg'=>'You already have a presentation with this title, please choose another title.'));
+        }
+    }
 
     //
     // Start transaction

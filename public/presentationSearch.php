@@ -60,15 +60,15 @@ function ciniki_conferences_presentationSearch($ciniki) {
     $date_format = ciniki_users_dateFormat($ciniki, 'php');
     $mysql_date_format = ciniki_users_dateFormat($ciniki, 'mysql');
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
     //
     // Search the presentations

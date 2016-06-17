@@ -66,19 +66,19 @@ function ciniki_conferences_CFPLogAdd(&$ciniki) {
     }
     $cfplog_id = $rc['id'];
 
-	//
-	// Update the categories
-	//
-	if( isset($args['categories']) ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsUpdate');
-		$rc = ciniki_core_tagsUpdate($ciniki, 'ciniki.conferences', 'cfplogtag', $args['business_id'],
-			'ciniki_conferences_cfplog_tags', 'ciniki_conferences_history',
-			'cfplog_id', $cfplog_id, 10, $args['categories']);
-		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
-			return $rc;
-		}
-	}
+    //
+    // Update the categories
+    //
+    if( isset($args['categories']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsUpdate');
+        $rc = ciniki_core_tagsUpdate($ciniki, 'ciniki.conferences', 'cfplogtag', $args['business_id'],
+            'ciniki_conferences_cfplog_tags', 'ciniki_conferences_history',
+            'cfplog_id', $cfplog_id, 10, $args['categories']);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+            return $rc;
+        }
+    }
 
     //
     // Commit the transaction

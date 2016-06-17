@@ -28,19 +28,19 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
     $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
-	//
-	// Load the presentations to be reviewed
-	//
+    //
+    // Load the presentations to be reviewed
+    //
     $strsql = "SELECT ciniki_conferences_presentations.id, "
         . "ciniki_conferences_presentations.conference_id, "
         . "ciniki_conferences_presentations.customer_id, "
@@ -85,16 +85,16 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     //
     // Load the business details
     //
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'businessDetails');
-	$rc = ciniki_businesses_businessDetails($ciniki, $business_id);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	if( isset($rc['details']) && is_array($rc['details']) ) {	
-		$business_details = $rc['details'];
-	} else {
-		$business_details = array();
-	}
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'businessDetails');
+    $rc = ciniki_businesses_businessDetails($ciniki, $business_id);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( isset($rc['details']) && is_array($rc['details']) ) {    
+        $business_details = $rc['details'];
+    } else {
+        $business_details = array();
+    }
 
     //
     // Load the conference details
@@ -113,65 +113,65 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     }
     $conference = $rc['conference'];
 
-	//
-	// Load TCPDF library
-	//
-	$rsp = array('stat'=>'ok');
-	require_once($ciniki['config']['ciniki.core']['lib_dir'] . '/tcpdf/tcpdf.php');
+    //
+    // Load TCPDF library
+    //
+    $rsp = array('stat'=>'ok');
+    require_once($ciniki['config']['ciniki.core']['lib_dir'] . '/tcpdf/tcpdf.php');
 
-	class MYPDF extends TCPDF {
-		public $left_margin = 18;
-		public $right_margin = 18;
-		public $top_margin = 18;
-		//Page header
-		public $header_image = null;
-		public $header_name = '';
-		public $header_addr = array();
-		public $header_details = array();
-		public $header_height = 25;		// The height of the image and address
-		public $business_details = array();
-		public $courses_settings = array();
+    class MYPDF extends TCPDF {
+        public $left_margin = 18;
+        public $right_margin = 18;
+        public $top_margin = 18;
+        //Page header
+        public $header_image = null;
+        public $header_name = '';
+        public $header_addr = array();
+        public $header_details = array();
+        public $header_height = 25;        // The height of the image and address
+        public $business_details = array();
+        public $courses_settings = array();
         public $conference_name = '';
 
-		public function Header() {
-			$this->SetFont('helvetica', 'I', 14);
+        public function Header() {
+            $this->SetFont('helvetica', 'I', 14);
             $this->Cell(0, 10, $this->conference_name, 0, false, 'C', 0, '', 0, false, 'T', 'M');
-		}
+        }
 
-		// Page footer
-		public function Footer() {
-			$this->SetY(-15);
-			$this->SetFont('helvetica', 'I', 8);
-			$this->Cell(0, 10, 'Page ' . $this->pageNo().'/'.$this->getAliasNbPages(), 
-				0, false, 'C', 0, '', 0, false, 'T', 'M');
-		}
-	}
+        // Page footer
+        public function Footer() {
+            $this->SetY(-15);
+            $this->SetFont('helvetica', 'I', 8);
+            $this->Cell(0, 10, 'Page ' . $this->pageNo().'/'.$this->getAliasNbPages(), 
+                0, false, 'C', 0, '', 0, false, 'T', 'M');
+        }
+    }
 
-	//
-	// Start a new document
-	//
-	$pdf = new MYPDF('P', PDF_UNIT, 'LETTER', true, 'UTF-8', false);
+    //
+    // Start a new document
+    //
+    $pdf = new MYPDF('P', PDF_UNIT, 'LETTER', true, 'UTF-8', false);
 
-	$pdf->business_details = $business_details;
+    $pdf->business_details = $business_details;
     $pdf->conference_name = $conference['name'];
 
-	//
-	// Setup the PDF basics
-	//
-	$pdf->SetCreator('Ciniki');
-	$pdf->SetAuthor($business_details['name']);
-	$pdf->SetTitle($conference['name']);
-	$pdf->SetSubject('');
-	$pdf->SetKeywords('');
+    //
+    // Setup the PDF basics
+    //
+    $pdf->SetCreator('Ciniki');
+    $pdf->SetAuthor($business_details['name']);
+    $pdf->SetTitle($conference['name']);
+    $pdf->SetSubject('');
+    $pdf->SetKeywords('');
 
-	// set margins
-	$pdf->SetMargins($pdf->left_margin, $pdf->top_margin + $pdf->header_height, $pdf->right_margin);
-	$pdf->SetHeaderMargin($pdf->top_margin);
+    // set margins
+    $pdf->SetMargins($pdf->left_margin, $pdf->top_margin + $pdf->header_height, $pdf->right_margin);
+    $pdf->SetHeaderMargin($pdf->top_margin);
 
 
-	// set font
-	$pdf->SetFont('times', 'BI', 10);
-	$pdf->SetCellPadding(2);
+    // set font
+    $pdf->SetFont('times', 'BI', 10);
+    $pdf->SetCellPadding(2);
     $pdf->SetFillColor(255);
     $pdf->SetTextColor(0);
     $pdf->SetDrawColor(51);
@@ -186,9 +186,9 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
         $pdf->MultiCell(180, 1, $presentation['field'], 0, 'L');
         $pdf->SetFont('', '', 10);
         $pdf->Ln();
-		$pdf->MultiCell(180, 8, $presentation['description'], 0, 'L');
+        $pdf->MultiCell(180, 8, $presentation['description'], 0, 'L');
     }
 
-	return array('stat'=>'ok', 'presentations'=>$presentations, 'conference'=>$conference, 'pdf'=>$pdf);
+    return array('stat'=>'ok', 'presentations'=>$presentations, 'conference'=>$conference, 'pdf'=>$pdf);
 }
 ?>

@@ -11,8 +11,8 @@
 // -------
 //
 function ciniki_conferences_maps($ciniki) {
-	$maps = array();
-	$maps['conference'] = array(
+    $maps = array();
+    $maps['conference'] = array(
         'status'=>array(
             '10'=>'Active',
             '50'=>'Archived',
@@ -21,8 +21,8 @@ function ciniki_conferences_maps($ciniki) {
             0x01=>'Visible',
             0x10=>'Open for proposals',
             0x20=>'Open for registrations',
-		));
-	$maps['attendee'] = array(
+        ));
+    $maps['attendee'] = array(
         'status'=>array(
             '0'=>'Unknown',
             '10'=>'Will Register',
@@ -30,7 +30,7 @@ function ciniki_conferences_maps($ciniki) {
             '50'=>'Not Registering',
             ),
         );
-	$maps['presentation'] = array(
+    $maps['presentation'] = array(
         'presentation_type'=>array(
             '10'=>'Individual Paper',
             '20'=>'Panel',
@@ -46,14 +46,14 @@ function ciniki_conferences_maps($ciniki) {
 //            '30'=>'Registered',
 //            '50'=>'Not Registering',
 //            ),
-		);
-	$maps['presentationreview'] = array(
+        );
+    $maps['presentationreview'] = array(
         'vote'=>array(
             '0'=>'Undecided',
             '30'=>'Accept',
             '50'=>'Reject',
-		));
+        ));
 
-	return array('stat'=>'ok', 'maps'=>$maps);
+    return array('stat'=>'ok', 'maps'=>$maps);
 }
 ?>

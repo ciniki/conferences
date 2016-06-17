@@ -25,6 +25,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
         'cfplogs'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'CFP Log Entries'),
         'presentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
         'presentation_status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
+        'registration_status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registrations'),
         'presentation_type'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
         'reviewers'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Reviewers'),
         'attendees'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Attendees'),
@@ -66,15 +67,15 @@ function ciniki_conferences_conferenceGet($ciniki) {
     $date_format = ciniki_users_dateFormat($ciniki, 'php');
     $mysql_date_format = ciniki_users_dateFormat($ciniki, 'mysql');
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
     //
     // Return default for new Conference
@@ -200,6 +201,9 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
             }
             $strsql .= "GROUP BY ciniki_conferences_presentations.id, voted ";
+            if( isset($args['registration_status']) && $args['registration_status'] != '' ) {
+                $strsql .= "HAVING registration = '" . ciniki_core_dbQuote($ciniki, $args['registration_status']) . "' ";
+            }
             $strsql .= "ORDER BY submission_date ";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'presentations', 'fname'=>'id', 
@@ -216,9 +220,11 @@ function ciniki_conferences_conferenceGet($ciniki) {
             if( $rc['stat'] != 'ok' ) {
                 return $rc;
             }
+            $customer_ids = array();
             if( isset($rc['presentations']) ) {
                 $conference['presentations'] = $rc['presentations'];
                 foreach($conference['presentations'] as $pid => $presentation) {
+                    $customer_ids[] = $presentation['customer_id'];
                     $conference['presentations'][$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
                     $conference['presentations'][$pid]['votes_received'] = 0;
                     $conference['presentations'][$pid]['total_reviews'] = 0;
@@ -240,38 +246,28 @@ function ciniki_conferences_conferenceGet($ciniki) {
             //
             // Get the email list
             //
-            $strsql = "SELECT ciniki_conferences_presentations.id, "
-                . "ciniki_conferences_presentations.conference_id, "
-                . "ciniki_conferences_presentations.customer_id, "
-                . "ciniki_customers.display_name, "
-                . "ciniki_customer_emails.email "
-                . "FROM ciniki_conferences_presentations "
-                . "LEFT JOIN ciniki_customers ON ("
-                    . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+            if( isset($customer_ids) && count($customer_ids) > 0 ) {
+                ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuoteIDs');
+                $strsql = "SELECT ciniki_customers.display_name, "
+                    . "ciniki_customer_emails.email "
+                    . "FROM ciniki_customers "
+                    . "LEFT JOIN ciniki_customer_emails ON ("
+                        . "ciniki_customers.id = ciniki_customer_emails.customer_id "
+                        . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                        . ") "
+                    . "WHERE ciniki_customers.id IN (" . ciniki_core_dbQuoteIDs($ciniki, $customer_ids). ") "
                     . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-                    . ") "
-                . "LEFT JOIN ciniki_customer_emails ON ("
-                    . "ciniki_customers.id = ciniki_customer_emails.customer_id "
-                    . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-                    . ") "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-                . "";
-            if( isset($args['presentation_status']) && $args['presentation_status'] > 0 ) {
-                $strsql .= "AND ciniki_conferences_presentations.status = '" . ciniki_core_dbQuote($ciniki, $args['presentation_status']) . "' ";
-            }
-            if( isset($args['presentation_type']) && $args['presentation_type'] > 0 ) {
-                $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
-            }
-            $strsql .= "ORDER BY submission_date ";
-            $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
-                array('container'=>'emails', 'fname'=>'id', 'fields'=>array('id', 'customer_id', 'display_name', 'email')),
-                ));
-            if( $rc['stat'] != 'ok' ) {
-                return $rc;
-            }
-            if( isset($rc['emails']) ) {
-                foreach($rc['emails'] as $email) {
-                    $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $email['display_name'] . '" ' . $email['email'];
+                    . "";
+                $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
+                    array('container'=>'emails', 'fname'=>'email', 'fields'=>array('display_name', 'email')),
+                    ));
+                if( $rc['stat'] != 'ok' ) {
+                    return $rc;
+                }
+                if( isset($rc['emails']) ) {
+                    foreach($rc['emails'] as $email) {
+                        $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $email['display_name'] . '" ' . $email['email'];
+                    }
                 }
             }
         }
@@ -399,6 +395,40 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 $conference['presentation_stats'][$status] = array(
                     'name'=>$status_text,
                     'count'=>(isset($rc['stats'][$status]['num_presentations'])?$rc['stats'][$status]['num_presentations']:0),
+                    );
+            }
+
+            //
+            // Get the registration stats
+            //
+            $strsql = "SELECT IFNULL(ciniki_conferences_attendees.status, 0) AS status, COUNT(*) AS num_attendees "
+                . "FROM ciniki_conferences_presentations "
+                . "LEFT JOIN ciniki_conferences_attendees ON ("
+                    . "ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
+                    . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_attendees.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
+                    . ") "
+                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
+                . "";
+            if( isset($args['presentation_status']) && $args['presentation_status'] > 0 ) {
+                $strsql .= "AND ciniki_conferences_presentations.status = '" . ciniki_core_dbQuote($ciniki, $args['presentation_status']) . "' ";
+            }
+            if( isset($args['presentation_type']) && $args['presentation_type'] > 0 ) {
+                $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
+            }
+            $strsql .= "GROUP BY status "
+                . "";
+            $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.conferences', array(
+                array('container'=>'stats', 'fname'=>'status', 'fields'=>array('status', 'num_attendees')),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            foreach($maps['attendee']['status'] as $type => $type_text) {
+                $conference['registration_statuses'][$type] = array(
+                    'name'=>$type_text,
+                    'count'=>(isset($rc['stats'][$type]['num_attendees'])?$rc['stats'][$type]['num_attendees']:0),
                     );
             }
 

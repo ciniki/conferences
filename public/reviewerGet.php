@@ -52,15 +52,15 @@ function ciniki_conferences_reviewerGet($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
     $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 
-	//
-	// Load conference maps
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
-	$rc = ciniki_conferences_maps($ciniki);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$maps = $rc['maps'];
+    //
+    // Load conference maps
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'maps');
+    $rc = ciniki_conferences_maps($ciniki);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $maps = $rc['maps'];
 
     $reviewer = array();
 
@@ -99,7 +99,7 @@ function ciniki_conferences_reviewerGet($ciniki) {
         . "WHERE ciniki_conferences_presentation_reviews.customer_id = '" . ciniki_core_dbQuote($ciniki, $args['reviewer_id']) . "' "
         . "AND ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "";
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'reviews', 'fname'=>'id', 
             'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_number', 'title', 'display_name', 'vote', 'vote_text'),
@@ -121,16 +121,16 @@ function ciniki_conferences_reviewerGet($ciniki) {
     //
     // Check for any messages sent
     //
-	if( isset($ciniki['business']['modules']['ciniki.mail']) ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'mail', 'hooks', 'objectMessages');
-		$rc = ciniki_mail_hooks_objectMessages($ciniki, $args['business_id'], array('object'=>'ciniki.conferences.conferencereviewer', 'object_id'=>$args['conference_id'] . '-' . $args['reviewer_id']));
-		if( $rc['stat'] != 'ok' ) {
-			return $rc;
-		}
-		if( isset($rc['messages']) ) {
-			$reviewer['messages'] = $rc['messages'];
-		}
-	} 
+    if( isset($ciniki['business']['modules']['ciniki.mail']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'mail', 'hooks', 'objectMessages');
+        $rc = ciniki_mail_hooks_objectMessages($ciniki, $args['business_id'], array('object'=>'ciniki.conferences.conferencereviewer', 'object_id'=>$args['conference_id'] . '-' . $args['reviewer_id']));
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        if( isset($rc['messages']) ) {
+            $reviewer['messages'] = $rc['messages'];
+        }
+    } 
 
     return array('stat'=>'ok', 'reviewer'=>$reviewer);
 }
