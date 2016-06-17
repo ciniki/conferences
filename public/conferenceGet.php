@@ -266,7 +266,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 }
                 if( isset($rc['emails']) ) {
                     foreach($rc['emails'] as $email) {
-                        $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $email['display_name'] . '" ' . $email['email'];
+                        $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $email['display_name'] . '" &lt;' . $email['email'] . '&gt;';
                     }
                 }
             }
@@ -366,7 +366,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             if( isset($rc['attendees']) ) {
                 $conference['attendees'] = $rc['attendees'];
                 foreach($conference['attendees'] as $attendee) {
-                    $email_list .= ($email_list != '' ? ",\n" : '') . '"' . $attendee['display_name'] . '" ' . $attendee['emails'];
+                    $email_list .= ($email_list != '' ? ", \n" : '') . '"' . $attendee['display_name'] . '" &lt;' . $attendee['emails'] . '&gt;';
                 }
             } else {
                 $conference['attendees'] = array();
