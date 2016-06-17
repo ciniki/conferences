@@ -40,12 +40,6 @@ function ciniki_conferences_maps($ciniki) {
             '30'=>'Accepted',
             '50'=>'Rejected',
             ),
-//        'registration'=>array(
-//            '0'=>'Unknown',
-//            '10'=>'Will Register',
-//            '30'=>'Registered',
-//            '50'=>'Not Registering',
-//            ),
         );
     $maps['presentationreview'] = array(
         'vote'=>array(

@@ -54,8 +54,8 @@ function ciniki_conferences_main() {
             'start_date':{'label':'Start'},
             'end_date':{'label':'End'},
         }},
-        'presentation_stats':{'label':'Presentations', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
-        'presentation_types':{'label':'Types', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
+//        'presentation_stats':{'label':'Presentations', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
+//        'presentation_types':{'label':'Types', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
         '_tabs':{'label':'', 'type':'paneltabs', 'selected':'presentations', 'tabs':{
             'attendees':{'label':'Attendees', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees");'},
             'reviewers':{'label':'Reviewers', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"reviewers");'},
@@ -64,11 +64,19 @@ function ciniki_conferences_main() {
             }},
         '_attendeetabs':{'label':'', 'type':'paneltabs', 'selected':'all', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
+            'count':function(tab) {
+                switch (tab) {
+                    case 'willregister': return (M.ciniki_conferences_main.conference.data.attendee_stats[10] != null ? M.ciniki_conferences_main.conference.data.attendee_stats[10].count : 0); break;
+                    case 'registered': return (M.ciniki_conferences_main.conference.data.attendee_stats[30] != null ? M.ciniki_conferences_main.conference.data.attendee_stats[30].count : 0); break;
+                    case 'notregistering': return (M.ciniki_conferences_main.conference.data.attendee_stats[50] != null ? M.ciniki_conferences_main.conference.data.attendee_stats[50].count : 0); break;
+                }
+                return '';
+            },
             'tabs':{
                 'all':{'label':'All', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","");'},
                 'willregister':{'label':'Will Register', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","willregister");'},
                 'registered':{'label':'Registered', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","registered");'},
-                'notregistering':{'label':'Not Registered', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","notregistering");'},
+                'notregistering':{'label':'Not Registering', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","notregistering");'},
             }},
         'attendees':{'label':'Attendees', 'type':'simplegrid', 'num_cols':3, 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
@@ -82,6 +90,16 @@ function ciniki_conferences_main() {
             },
         '_presentationtabs':{'label':'', 'type':'paneltabs', 'selected':'all', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
+            'count':function(tab) {
+                switch (tab) {
+                    case 'submitted': return (M.ciniki_conferences_main.conference.data.presentation_stats[10] != null ? M.ciniki_conferences_main.conference.data.presentation_stats[10].count : 0); break;
+                    case 'accepted': return (M.ciniki_conferences_main.conference.data.presentation_stats[30] != null ? M.ciniki_conferences_main.conference.data.presentation_stats[30].count : 0); break;
+                    case 'rejected': return (M.ciniki_conferences_main.conference.data.presentation_stats[50] != null ? M.ciniki_conferences_main.conference.data.presentation_stats[50].count : 0); break;
+                    case 'papers': return (M.ciniki_conferences_main.conference.data.presentation_types[10] != null ? M.ciniki_conferences_main.conference.data.presentation_types[10].count : 0); break;
+                    case 'panels': return (M.ciniki_conferences_main.conference.data.presentation_types[20] != null ? M.ciniki_conferences_main.conference.data.presentation_types[20].count : 0); break;
+                }
+                return '';
+            },
             'tabs':{
                 'all':{'label':'All', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"presentations","all");'},
                 'submitted':{'label':'Submitted', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"presentations","submitted");'},
@@ -93,7 +111,6 @@ function ciniki_conferences_main() {
         '_registrationtabs':{'label':'', 'type':'paneltabs', 'selected':'all', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='presentations'?'yes':'no';},
             'count':function(tab) {
-                console.log(M.ciniki_conferences_main.conference.data);
                 switch (tab) {
                     case 'unknown': return (M.ciniki_conferences_main.conference.data.registration_statuses[0] != null ? M.ciniki_conferences_main.conference.data.registration_statuses[0].count : 0); break;
                     case 'willregister': return (M.ciniki_conferences_main.conference.data.registration_statuses[10] != null ? M.ciniki_conferences_main.conference.data.registration_statuses[10].count : 0); break;

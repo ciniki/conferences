@@ -399,6 +399,29 @@ function ciniki_conferences_conferenceGet($ciniki) {
             }
 
             //
+            // Get the attendee stats
+            //
+            $strsql = "SELECT status, COUNT(status) AS num_attendees "
+                . "FROM ciniki_conferences_attendees "
+                . "WHERE ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND ciniki_conferences_attendees.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
+                . "GROUP BY status "
+                . "";
+            $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.conferences', array(
+                array('container'=>'stats', 'fname'=>'status', 'fields'=>array('status', 'num_attendees')),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            $conference['attendee_stats'] = array();
+            foreach($maps['attendee']['status'] as $status => $status_text) {
+                $conference['attendee_stats'][$status] = array(
+                    'name'=>$status_text,
+                    'count'=>(isset($rc['stats'][$status]['num_attendees'])?$rc['stats'][$status]['num_attendees']:0),
+                    );
+            }
+
+            //
             // Get the registration stats
             //
             $strsql = "SELECT IFNULL(ciniki_conferences_attendees.status, 0) AS status, COUNT(*) AS num_attendees "
