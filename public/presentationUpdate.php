@@ -71,7 +71,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         //
         // Make sure the permalink is unique
         //
-        $strsql = "SELECT id, name, permalink "
+        $strsql = "SELECT id, title, permalink "
             . "FROM ciniki_conferences_presentations "
             . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, (isset($args['conference_id'])?$args['conference_id']:$item['conference_id'])) . "' "
