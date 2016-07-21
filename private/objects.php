@@ -59,6 +59,8 @@ function ciniki_conferences_objects($ciniki) {
             'presentation_number'=>array('name'=>'Type', 'default'=>'0'),
             'presentation_type'=>array('name'=>'Type'),
             'status'=>array('name'=>'Status', 'default'=>'10'),
+            'session_id'=>array('name'=>'Session', 'default'=>'0'),
+            'registration'=>array('name'=>'Registration Status', 'default'=>'0'),
             'submission_date'=>array('name'=>'Submission Date'),
             'field'=>array('name'=>'Field of Study', 'default'=>''),
             'title'=>array('name'=>'Title'),
@@ -79,6 +81,33 @@ function ciniki_conferences_objects($ciniki) {
             'customer_id'=>array('name'=>'Reviewer', 'ref'=>'ciniki.customers.customer'),
             'vote'=>array('name'=>'Vote', 'default'=>'0'),
             'notes'=>array('name'=>'Notes', 'default'=>''),
+            ),
+        'history_table'=>'ciniki_conferences_history',
+        );
+    $objects['room'] = array(
+        'name'=>'Conference Room',
+        'o_name'=>'room',
+        'o_container'=>'rooms',
+        'sync'=>'yes',
+        'table'=>'ciniki_conferences_rooms',
+        'fields'=>array(
+            'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+            'name'=>array('name'=>'Name'),
+            'sequence'=>array('name'=>'Order', 'default'=>'1'),
+            ),
+        'history_table'=>'ciniki_conferences_history',
+        );
+    $objects['session'] = array(
+        'name'=>'Conference Session',
+        'o_name'=>'session',
+        'o_container'=>'sessions',
+        'sync'=>'yes',
+        'table'=>'ciniki_conferences_sessions',
+        'fields'=>array(
+            'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
+            'room_id'=>array('name'=>'Room', 'ref'=>'ciniki.conferences.room'),
+            'session_start'=>array('name'=>'Start'),
+            'session_end'=>array('name'=>'End'),
             ),
         'history_table'=>'ciniki_conferences_history',
         );

@@ -57,11 +57,54 @@ function ciniki_conferences_main() {
 //        'presentation_stats':{'label':'Presentations', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
 //        'presentation_types':{'label':'Types', 'aside':'yes', 'type':'simplegrid', 'num_cols':1},
         '_tabs':{'label':'', 'type':'paneltabs', 'selected':'presentations', 'tabs':{
+//            'sessions':{'label':'Sessions', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"sessions");'},
             'attendees':{'label':'Attendees', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees");'},
             'reviewers':{'label':'Reviewers', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"reviewers");'},
             'presentations':{'label':'Presentations', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"presentations");'},
             'cfplogs':{'label':'CFP', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"cfplogs");'},
             }},
+        '_sessiontabs':{'label':'', 'type':'paneltabs', 'selected':'sessions', 
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'?'yes':'no';},
+            'tabs':{
+                'presentations':{'label':'Presentations', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"sessions","presentations");'},
+                'sessions':{'label':'Sessions', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"sessions","sessions");'},
+                'rooms':{'label':'Rooms', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"sessions","rooms");'},
+            }},
+        'assignedpresentations':{'label':'Assigned Presentations', 'type':'simplegrid', 'num_cols':3, 
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'&&M.ciniki_conferences_main.conference.sections._sessiontabs.selected=='presentations'?'yes':'no';},
+            'sortable':'yes',
+            'sortTypes':['text', 'text', 'text'],
+            'headerValues':['Room', 'Session', 'Presentation'],
+            'cellClasses':['multiline', 'multiline', 'multiline'],
+            'noData':'No Assigned Presentations',
+            },
+        'unassignedpresentations':{'label':'Unassigned Presentations', 'type':'simplegrid', 'num_cols':3, 
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'&&M.ciniki_conferences_main.conference.sections._sessiontabs.selected=='presentations'?'yes':'no';},
+            'sortable':'yes',
+            'sortTypes':['altnumber', 'altnumber', 'altnumber'],
+            'headerValues':['Title', 'Reviews', 'Status'],
+            'cellClasses':['multiline', 'multiline', 'multiline'],
+            'noData':'No Unassigned Presentations',
+            },
+        'sessions':{'label':'Sessions', 'type':'simplegrid', 'num_cols':3, 
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'&&M.ciniki_conferences_main.conference.sections._sessiontabs.selected=='sessions'?'yes':'no';},
+            'sortable':'yes',
+            'sortTypes':['text', 'text'],
+            'headerValues':['Room', 'Session'],
+            'cellClasses':['', 'multiline'],
+            'noData':'No sessions',
+            'addTxt':'Add Session',
+            'addFn':'M.ciniki_conferences_main.session.open(\'M.ciniki_conferences_main.conference.open();\',0,M.ciniki_conferences_main.conference.conference_id);',
+            },
+        'rooms':{'label':'Rooms', 'type':'simplegrid', 'num_cols':3, 
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'&&M.ciniki_conferences_main.conference.sections._sessiontabs.selected=='rooms'?'yes':'no';},
+            'sortable':'yes',
+            'sortTypes':['text'],
+            'cellClasses':[''],
+            'noData':'No rooms',
+            'addTxt':'Add Room',
+            'addFn':'M.ciniki_conferences_main.room.open(\'M.ciniki_conferences_main.conference.open();\',0,M.ciniki_conferences_main.conference.conference_id);',
+            },
         '_attendeetabs':{'label':'', 'type':'paneltabs', 'selected':'all', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
             'count':function(tab) {
@@ -281,7 +324,9 @@ function ciniki_conferences_main() {
         if( cid != null ) { this.conference_id = cid; }
         if( tab != null ) { this.sections._tabs.selected = tab; }
         if( subtab != null ) {
-            if( this.sections._tabs.selected == 'attendees' ) {
+            if( this.sections._tabs.selected == 'sessions' ) {
+                this.sections._sessiontabs.selected = subtab;
+            } else if( this.sections._tabs.selected == 'attendees' ) {
                 this.sections._attendeetabs.selected = subtab;
             } else if( this.sections._tabs.selected == 'presentations' ) {
                 this.sections._presentationtabs.selected = subtab;
@@ -293,7 +338,13 @@ function ciniki_conferences_main() {
             }
         }
         var args = {'business_id':M.curBusinessID, 'conference_id':this.conference_id};
-        if( this.sections._tabs.selected == 'attendees' ) {
+        if( this.sections._tabs.selected == 'sessions' ) {
+            switch (this.sections._sessiontabs.selected) {
+                case 'presentations': args['sessionpresentations'] = 'yes'; break;
+                case 'sessions': args['sessions'] = 'yes'; break;
+                case 'rooms': args['rooms'] = 'yes'; break;
+            }
+        } else if( this.sections._tabs.selected == 'attendees' ) {
             args['attendees'] = 'yes';
             if( this.sections._attendeetabs.selected != '' ) {
                 switch (this.sections._attendeetabs.selected) {

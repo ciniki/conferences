@@ -1,0 +1,5 @@
+#
+# Upgrade to 1.03
+#
+ALTER TABLE ciniki_conferences_presentations ADD COLUMN session_id int not null AFTER status;
+ALTER TABLE ciniki_conferences_presentations COMMENT='v1.03';
