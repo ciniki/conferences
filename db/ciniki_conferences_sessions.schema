@@ -13,6 +13,8 @@
 #
 # room_id:              The ID of room the session is being held in.
 #
+# name:                 The name for the session.
+#
 # session_start:        The UTC date and time the session starts.
 # session_end:          The UTC date and time the session ends.
 #
@@ -25,6 +27,7 @@ create table ciniki_conferences_sessions (
     business_id int not null,
     conference_id int not null,
     room_id int not null, 
+    name varchar(150) not null, 
     session_start datetime not null,
     session_end datetime not null,
     date_added datetime not null,

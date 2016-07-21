@@ -20,6 +20,7 @@ function ciniki_conferences_roomList($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'conference_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Conference'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -44,6 +45,7 @@ function ciniki_conferences_roomList($ciniki) {
         . "ciniki_conferences_rooms.sequence "
         . "FROM ciniki_conferences_rooms "
         . "WHERE ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND ciniki_conferences_rooms.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(

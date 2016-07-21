@@ -106,6 +106,7 @@ function ciniki_conferences_objects($ciniki) {
         'fields'=>array(
             'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
             'room_id'=>array('name'=>'Room', 'ref'=>'ciniki.conferences.room'),
+            'name'=>array('name'=>'Name'),
             'session_start'=>array('name'=>'Start'),
             'session_end'=>array('name'=>'End'),
             ),

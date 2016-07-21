@@ -30,6 +30,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
         'reviewers'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Reviewers'),
         'attendees'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Attendees'),
         'attendee_status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
+        'rooms'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Rooms'),
+        'sessions'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Session'),
+        'assignedpresentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Assigned Presentations'),
+        'unassignedpresentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Unassigned Presentations'),
         'stats'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Stats'),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -504,11 +508,12 @@ function ciniki_conferences_conferenceGet($ciniki) {
             $strsql = "SELECT ciniki_conferences_sessions.id, "
                 . "ciniki_conferences_sessions.conference_id, "
                 . "ciniki_conferences_sessions.room_id, "
-                . "ciniki_conferences_rooms.name, "
+                . "ciniki_conferences_sessions.name, "
+                . "ciniki_conferences_rooms.name AS room, "
                 . "ciniki_conferences_rooms.sequence, "
                 . "ciniki_conferences_sessions.session_start AS start_time, "
                 . "ciniki_conferences_sessions.session_start AS start_date, "
-                . "ciniki_conferences_sessions.session_end AS end_time, "
+                . "ciniki_conferences_sessions.session_end AS end_time "
                 . "FROM ciniki_conferences_sessions "
                 . "INNER JOIN ciniki_conferences_rooms ON ("
                     . "ciniki_conferences_sessions.room_id = ciniki_conferences_rooms.id "
@@ -522,7 +527,8 @@ function ciniki_conferences_conferenceGet($ciniki) {
             ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'sessions', 'fname'=>'id', 
-                    'fields'=>array('id', 'conference_id', 'room_id', 'name', 'sequence', 'session_start', 'session_end'),
+                    'fields'=>array('id', 'conference_id', 'name', 'room_id', 'room', 'sequence', 
+                        'start_time', 'start_date', 'end_time'),
                     'utctotz'=>array(
                         'start_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
                         'start_date'=>array('format'=>$date_format, 'timezone'=>$intl_timezone),

@@ -51,7 +51,11 @@ function ciniki_conferences_presentationGet($ciniki) {
     $intl_currency = $rc['settings']['intl-default-currency'];
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timeFormat');
     $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
+    $date_format = ciniki_users_dateFormat($ciniki, 'php');
+    $time_format = ciniki_users_timeFormat($ciniki, 'php');
 
     //
     // Load conference maps
@@ -70,6 +74,7 @@ function ciniki_conferences_presentationGet($ciniki) {
         $presentation = array('id'=>0,
             'conference_id'=>'',
             'customer_id'=>'',
+            'session_id'=>0,
             'presentation_number'=>'',
             'presentation_type'=>'',
             'status'=>'10',
@@ -80,6 +85,7 @@ function ciniki_conferences_presentationGet($ciniki) {
             'permalink'=>'',
             'description'=>'',
         );
+        $sessions = array();
     }
 
     //
@@ -89,6 +95,7 @@ function ciniki_conferences_presentationGet($ciniki) {
         $strsql = "SELECT ciniki_conferences_presentations.id, "
             . "ciniki_conferences_presentations.conference_id, "
             . "ciniki_conferences_presentations.customer_id, "
+            . "ciniki_conferences_presentations.session_id, "
             . "ciniki_customers.display_name, "
             . "ciniki_conferences_presentations.presentation_number, "
             . "ciniki_conferences_presentations.presentation_type, "
@@ -117,7 +124,7 @@ function ciniki_conferences_presentationGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
             array('container'=>'presentations', 'fname'=>'id', 
-                'fields'=>array('id', 'conference_id', 'customer_id', 'display_name', 'presentation_number', 'presentation_type', 'presentation_type_text',
+                'fields'=>array('id', 'conference_id', 'customer_id', 'session_id', 'display_name', 'presentation_number', 'presentation_type', 'presentation_type_text',
                     'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'permalink', 'description'),
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
@@ -183,8 +190,55 @@ function ciniki_conferences_presentationGet($ciniki) {
         } else {
             $presentation['reviews'] = array();
         }
+
+        //
+        // Get the list of sessions
+        //
+        $strsql = "SELECT ciniki_conferences_sessions.id, "
+            . "ciniki_conferences_sessions.conference_id, "
+            . "ciniki_conferences_sessions.room_id, "
+            . "ciniki_conferences_sessions.name, "
+            . "ciniki_conferences_rooms.name AS room, "
+            . "ciniki_conferences_rooms.sequence, "
+            . "ciniki_conferences_sessions.session_start AS start_time, "
+            . "ciniki_conferences_sessions.session_start AS start_date, "
+            . "ciniki_conferences_sessions.session_end AS end_time "
+            . "FROM ciniki_conferences_sessions "
+            . "LEFT JOIN ciniki_conferences_rooms ON ("
+                . "ciniki_conferences_sessions.room_id = ciniki_conferences_rooms.id "
+                . "AND ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . ") "
+            . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_conferences_sessions.conference_id = '" . ciniki_core_dbQuote($ciniki, $presentation['conference_id']) . "' "
+            . "";
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
+            array('container'=>'sessions', 'fname'=>'id', 
+                'fields'=>array('id', 'conference_id', 'room', 'room_id', 'name', 'sequence', 
+                    'start_time', 'start_date', 'end_time'),
+                'utctotz'=>array(
+                    'start_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
+                    'start_date'=>array('format'=>$date_format, 'timezone'=>$intl_timezone),
+                    'end_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
+                    )),
+            ));
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        if( isset($rc['sessions']) ) {
+            $sessions = $rc['sessions'];
+            foreach($sessions as $sid => $session) {
+                $sessions[$sid]['display_name'] = $session['name'];
+                if( $session['room'] != '' ) {
+                    $sessions[$sid]['display_name'] .= ($sessions[$sid]['display_name'] != '' ? ' - ' : '') . $session['room'];
+                }
+                $sessions[$sid]['display_name'] .= ($sessions[$sid]['display_name'] != '' ? ' - ' : '') . $session['start_time'] . ' - ' . $session['end_time'] . ', ' . $session['start_date'];
+            }
+        } else {
+            $sessions = array();
+        }
     }
 
-    return array('stat'=>'ok', 'presentation'=>$presentation);
+    return array('stat'=>'ok', 'presentation'=>$presentation, 'sessions'=>$sessions);
 }
 ?>

@@ -20,8 +20,9 @@ function ciniki_conferences_sessionUpdate(&$ciniki) {
         'session_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Conference Session'),
         'conference_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Conference'),
         'room_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Room'),
-        'session_start'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Start'),
-        'session_end'=>array('required'=>'no', 'blank'=>'no', 'name'=>'End'),
+        'name'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Name'),
+        'session_start'=>array('required'=>'no', 'blank'=>'no', 'type'=>'datetimetoutc', 'name'=>'Start'),
+        'session_end'=>array('required'=>'no', 'blank'=>'no', 'type'=>'datetimetoutc', 'name'=>'End'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;

@@ -22,6 +22,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         'customer_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
         'presentation_type'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Type'),
         'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'),
+        'session_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Session'),
         'registration'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
         'submission_date'=>array('required'=>'no', 'blank'=>'no', 'type'=>'datetimetoutc', 'name'=>'Submission Date'),
         'field'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Field of Study'),

@@ -54,7 +54,8 @@ function ciniki_conferences_sessionList($ciniki) {
     $strsql = "SELECT ciniki_conferences_sessions.id, "
         . "ciniki_conferences_sessions.conference_id, "
         . "ciniki_conferences_sessions.room_id, "
-        . "ciniki_conferences_rooms.name, "
+        . "ciniki_conferences_sessions.name, "
+        . "ciniki_conferences_rooms.name AS room, "
         . "ciniki_conferences_rooms.sequence, "
         . "ciniki_conferences_sessions.session_start, "
         . "ciniki_conferences_sessions.session_end "
@@ -64,7 +65,7 @@ function ciniki_conferences_sessionList($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'sessions', 'fname'=>'id', 
-            'fields'=>array('id', 'conference_id', 'room_id', 'name', 'sequence', 'session_start', 'session_end'),
+            'fields'=>array('id', 'conference_id', 'name', 'room_id', 'room', 'sequence', 'session_start', 'session_end'),
             'utctotz'=>array('session_start'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone)),
             ),
         ));
