@@ -250,7 +250,7 @@ function ciniki_conferences_main() {
             if( d.status == 30 ) { return 'statusgreen'; }
             if( d.status == 50 ) { return 'statusred'; }
         }
-        if( s == 'presentations' || s == 'presentationsearch' ) {
+        if( s == 'assignedpresentations' || s == 'unassignedpresentations' || s == 'presentations' || s == 'presentationsearch' ) {
             if( d.status == 50 || d.registration == 50 ) { return 'statusred'; }
             else if( d.status == 30 && d.registration == 30 ) { return 'statusgreen'; }
             else if( d.status == 30 && d.registration < 10 ) { return 'statusgrey'; }
@@ -261,6 +261,12 @@ function ciniki_conferences_main() {
     this.conference.cellValue = function(s, i, j, d) {
         if( s == 'presentation_stats' || s == 'presentation_types' ) {
             return d.name + ' <span class="count">' + d.count + '</span>'; 
+        } else if( s == 'assignedpresentations' ) {
+            switch (j) {
+                case 0: return d.room;
+                case 1: return '<span class="maintext">' + d.start_time + ' - ' + d.end_time + '</span><span class="subtext">' + d.start_date + '</span>';
+                case 2: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+            }
         } else if( s == 'unassignedpresentations' ) {
             switch (j) {
                 case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
@@ -318,7 +324,9 @@ function ciniki_conferences_main() {
                 case '10': return 'M.ciniki_conferences_main.conference.open(null,null,"presentations","papers");';
                 case '20': return 'M.ciniki_conferences_main.conference.open(null,null,"presentations","panels");';
             }
-        } else if( s == 'presentations' || s == 'presentationsearch' ) {
+        } else if( s == 'assignedpresentations' ) {
+            return 'M.ciniki_conferences_main.presentation.open(\'M.ciniki_conferences_main.conference.open();\',\'' + d.presentation_id + '\',M.ciniki_conferences_main.conference.conference_id);';
+        } else if( s == 'unassignedpresentations' || s == 'presentations' || s == 'presentationsearch' ) {
             return 'M.ciniki_conferences_main.presentation.open(\'M.ciniki_conferences_main.conference.open();\',\'' + d.id + '\',M.ciniki_conferences_main.conference.conference_id);';
         } else if( s == 'reviewers' ) {
             return 'M.ciniki_conferences_main.reviewer.open(\'M.ciniki_conferences_main.conference.open();\',\'' + d.customer_id + '\',M.ciniki_conferences_main.conference.conference_id);';

@@ -32,8 +32,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
         'attendee_status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
         'rooms'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Rooms'),
         'sessions'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Session'),
-        'assignedpresentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Assigned Presentations'),
-        'unassignedpresentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Unassigned Presentations'),
+        'sessionpresentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Assigned Presentations'),
         'stats'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Stats'),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -385,21 +384,24 @@ function ciniki_conferences_conferenceGet($ciniki) {
         //
         if( isset($args['sessionpresentations']) && $args['sessionpresentations'] == 'yes' ) {
             $strsql = "SELECT ciniki_conferences_sessions.id, "
+                . "CONCAT_WS('-', ciniki_conferences_sessions.id, ciniki_conferences_presentations.id) AS rowid, "
                 . "ciniki_conferences_sessions.conference_id, "
                 . "ciniki_conferences_sessions.room_id, "
-                . "ciniki_conferences_rooms.name, "
+                . "ciniki_conferences_rooms.name AS room, "
                 . "ciniki_conferences_rooms.sequence, "
+                . "ciniki_conferences_sessions.name, "
                 . "ciniki_conferences_sessions.session_start AS start_time, "
                 . "ciniki_conferences_sessions.session_start AS start_date, "
                 . "ciniki_conferences_sessions.session_end AS end_time, "
                 . "IFNULL(ciniki_conferences_presentations.id, 0) AS presentation_id, "
                 . "IFNULL(ciniki_conferences_presentations.customer_id, 0) AS customer_id, "
+                . "IFNULL(ciniki_conferences_presentations.presentation_number, '') AS presentation_number, "
                 . "IFNULL(ciniki_conferences_presentations.title, '') AS presentation_title, "
-                . "IFNULL(ciniki_customers.display_name, '') AS display_name "
-                . "IFNULL(ciniki_conferences_presentations.status, 0) AS presentation_status, "
-                . "IFNULL(ciniki_conferences_presentations.status, '') AS presentation_status_text, "
+                . "IFNULL(ciniki_customers.display_name, '') AS display_name, "
+                . "IFNULL(ciniki_conferences_presentations.status, 0) AS status, "
+                . "IFNULL(ciniki_conferences_presentations.status, '') AS status_text, "
                 . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration, "
-                . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration_text, "
+                . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration_text "
                 . "FROM ciniki_conferences_sessions "
                 . "INNER JOIN ciniki_conferences_rooms ON ("
                     . "ciniki_conferences_sessions.room_id = ciniki_conferences_rooms.id "
@@ -427,14 +429,16 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "";
             ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
-                array('container'=>'sessions', 'fname'=>'id', 
-                    'fields'=>array('id', 'conference_id', 'room_id', 'name', 'sequence', 'session_start', 'session_end',
-                        'presentation_id', 'customer_id', 'presentation_title', 'display_name', 'presentation_status', 'registration', 'registration_text'),
+                array('container'=>'sessions', 'fname'=>'rowid', 
+                    'fields'=>array('id', 'conference_id', 'room_id', 'room', 'sequence', 'name', 'start_time', 'start_date', 'end_time',
+                        'presentation_id', 'customer_id', 'presentation_number', 'presentation_title', 'display_name', 'status', 'status_text', 'registration', 'registration_text'),
                     'utctotz'=>array(
                         'start_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
                         'start_date'=>array('format'=>$date_format, 'timezone'=>$intl_timezone),
                         'end_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
-                        'presentation_status_text'=>$maps['presentation']['status'],
+                        ),
+                    'maps'=>array(
+                        'status_text'=>$maps['presentation']['status'],
                         'registration_text'=>$maps['attendee']['status'],
                         )),
                 ));
@@ -443,6 +447,13 @@ function ciniki_conferences_conferenceGet($ciniki) {
             }
             if( isset($rc['sessions']) ) {
                 $conference['assignedpresentations'] = $rc['sessions'];
+                foreach($conference['assignedpresentations'] as $pid => $presentation) {
+                    if( $presentation['presentation_id'] > 0 ) {
+                        $conference['assignedpresentations'][$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['presentation_title'];
+                    } else {
+                        $conference['assignedpresentations'][$pid]['display_title'] = '';
+                    }
+                }
             } else {
                 $conference['assignedpresentations'] = array();
             }
@@ -478,13 +489,13 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                 . "AND ciniki_conferences_presentations.session_id = 0 "
                 . "AND ciniki_conferences_presentations.status = 30 "
+                . "HAVING registration = 30 "
                 . "ORDER BY submission_date "
                 . "";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                 array('container'=>'presentations', 'fname'=>'id', 
                     'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 'presentation_number',
                         'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'display_name', 'permalink'),
-                     'utctotz'=>array('submission_date'=>array('format'=>'M j', 'timezone'=>$intl_timezone)),
                      'maps'=>array(
                         'status_text'=>$maps['presentation']['status'],
                         'registration_text'=>$maps['attendee']['status'],
@@ -494,8 +505,11 @@ function ciniki_conferences_conferenceGet($ciniki) {
             if( $rc['stat'] != 'ok' ) {
                 return $rc;
             }
-            if( isset($rc['unassignedpresentations']) ) {
+            if( isset($rc['presentations']) ) {
                 $conference['unassignedpresentations'] = $rc['presentations'];
+                foreach($conference['unassignedpresentations'] as $pid => $presentation) {
+                    $conference['unassignedpresentations'][$pid]['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
+                }
             } else {
                 $conference['unassignedpresentations'] = array();
             }
