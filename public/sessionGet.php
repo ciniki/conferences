@@ -81,15 +81,22 @@ function ciniki_conferences_sessionGet($ciniki) {
             . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . "AND ciniki_conferences_sessions.id = '" . ciniki_core_dbQuote($ciniki, $args['session_id']) . "' "
             . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
-        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'session');
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
+            array('container'=>'sessions', 'fname'=>'id', 
+                'fields'=>array('id', 'conference_id', 'room_id', 'name', 'session_start', 'session_end'),
+                'utctotz'=>array(
+                    'session_start'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone),
+                    'session_end'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone),
+                    )),
+            ));
         if( $rc['stat'] != 'ok' ) {
             return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3599', 'msg'=>'Conference Session not found', 'err'=>$rc['err']));
         }
-        if( !isset($rc['session']) ) {
+        if( !isset($rc['sessions'][0]) ) {
             return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3600', 'msg'=>'Unable to find Conference Session'));
         }
-        $session = $rc['session'];
+        $session = $rc['sessions'][0];
     }
 
     //
