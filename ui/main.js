@@ -108,7 +108,8 @@ function ciniki_conferences_main() {
         '_schedule':{'label':'', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='sessions'?'yes':'no';},
             'buttons':{
-                'downloadword':{'label':'Download Schedule (Word)', 'fn':'M.ciniki_conferences_main.conference.scheduleDownload();'},
+                'scheduleword':{'label':'Download Schedule (Word)', 'fn':'M.ciniki_conferences_main.conference.scheduleDownload();'},
+                'biosword':{'label':'Download Bios (Word)', 'fn':'M.ciniki_conferences_main.conference.biosDownload();'},
             }},
         '_attendeetabs':{'label':'', 'type':'paneltabs', 'selected':'all', 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
@@ -419,6 +420,9 @@ function ciniki_conferences_main() {
     };
     this.conference.scheduleDownload = function() {
         M.api.openFile('ciniki.conferences.conferenceScheduleDownload', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'output':'word'});
+    };
+    this.conference.biosDownload = function() {
+        M.api.openFile('ciniki.conferences.conferenceBiosDownload', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'output':'word'});
     };
     this.conference.addButton('edit', 'Edit', 'M.ciniki_conferences_main.edit.edit(\'M.ciniki_conferences_main.conference.open();\',M.ciniki_conferences_main.conference.conference_id);');
     this.conference.addClose('Back');
