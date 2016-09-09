@@ -114,6 +114,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         . "IFNULL(ciniki_conferences_presentations.customer_id, 0) AS customer_id, "
         . "IFNULL(ciniki_conferences_presentations.presentation_number, '') AS presentation_number, "
         . "IFNULL(ciniki_conferences_presentations.title, '') AS presentation_title, "
+        . "IFNULL(ciniki_conferences_presentations.description, '') AS presentation_description, "
         . "IFNULL(ciniki_customers.display_name, '') AS display_name, "
         . "IFNULL(ciniki_conferences_presentations.status, 0) AS status, "
         . "IFNULL(ciniki_conferences_presentations.status, '') AS status_text, "
@@ -156,7 +157,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         array('container'=>'rooms', 'fname'=>'room_id', 'fields'=>array('id'=>'room_id', 'name'=>'room', 'session_name'=>'name', 'presentation_id')),
         array('container'=>'presentations', 'fname'=>'presentation_id', 
             'fields'=>array('id', 'conference_id', 'room_id', 'room', 'sequence', 'name', 'start_time', 'start_date', 'end_time',
-                'presentation_id', 'customer_id', 'presentation_number', 'presentation_title', 'display_name', 'status', 'status_text', 'registration', 'registration_text'),
+                'presentation_id', 'customer_id', 'presentation_number', 'presentation_title', 'presentation_description', 'display_name', 'status', 'status_text', 'registration', 'registration_text'),
             'utctotz'=>array(
                 'start_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
                 'start_date'=>array('format'=>$date_format, 'timezone'=>$intl_timezone),
@@ -185,8 +186,9 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
     require($ciniki['config']['core']['lib_dir'] . '/PHPWord/src/PhpWord/PhpWord.php');
 
     $PHPWord = new \PhpOffice\PhpWord\PhpWord();
-    $PHPWord->addTitleStyle(1, array('bold'=>true, 'size'=>14), array('spaceBefore'=>240, 'spaceAfter'=>120));
-    $h1_size = 20;
+    $PHPWord->addTitleStyle(1, array('bold'=>true, 'size'=>18), array('spaceBefore'=>240, 'spaceAfter'=>120));
+    $PHPWord->addTitleStyle(2, array('bold'=>true, 'size'=>16), array('spaceBefore'=>120, 'spaceAfter'=>120));
+    $PHPWord->addTitleStyle(3, array('bold'=>false, 'size'=>14), array('spaceBefore'=>120, 'spaceAfter'=>120));
     $style_table = array('cellMargin'=>80, 'borderColor'=>'aaaaaa', 'borderSize'=>6);
     $style_header = array('borderSize'=>6, 'borderColor'=>'aaaaaa', 'bgColor'=>'dddddd', 'valign'=>'center');
     $style_cell = array('borderSize'=>6, 'borderColor'=>'aaaaaa', 'valign'=>'center', 'bgcolor'=>'ffffff');
@@ -213,7 +215,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
     //
     $cur_date = '';
     $table = $section->addTable($style_table);
-    $session_number = 0;
+    $session_number = 1;
     foreach($timeslots as $timeslot) {
         //
         // Add the date as a header
@@ -224,7 +226,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
             $cell->addText($timeslot['start_date']);
             $cell->setGridSpan(2);
             $cur_date = $timeslot['start_date'];
-            $session_number = 1;
+//            $session_number = 1;
         }
 
         //
@@ -274,11 +276,43 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         }
     }
 
+    $section = $PHPWord->addSection();
+    $header = $section->addHeader();
+    $table = $header->addTable();
+    $table->addRow();
+    $cell = $table->addCell(9600);
+    $cell->addText($conference['name'], array('size'=>'16'), array('align'=>'center'));
+
+    $session_number = 1;
+    foreach($timeslots as $timeslot) {
+        if( isset($timeslot['rooms']) && count($timeslot['rooms']) > 0 ) {
+            foreach($timeslot['rooms'] as $room) {
+                if( !isset($room['presentations']) || $room['presentation_id'] == 0 ) {
+                    continue;
+                }
+                $section->addTitle($session_number . ". " . $room['session_name'], 1);
+                if( isset($room['presentations']) && $room['presentation_id'] != 0 ) {
+                    foreach($room['presentations'] as $pid => $presentation) {
+                        $section->addTitle($presentation['display_name'], 2);
+                        $section->addTitle(htmlspecialchars($presentation['presentation_title']), 3);
+                        $lines = explode("\n", $presentation['presentation_description']);
+                        foreach($lines as $line) {
+                            $section->addText(htmlspecialchars($line), array());
+                        }
+                        $section->addText('');
+                    } 
+                }
+                $session_number++;
+            }
+        }
+    }
+
+
     //
     // Output the word file
     //
     header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    header('Content-Disposition: attachment;filename="report.docx"');
+    header('Content-Disposition: attachment;filename="' . preg_replace("/[^A-Za-z0-9]/", '', $conference['name']) . '.docx"');
     header('Cache-Control: max-age=0');
 
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($PHPWord, 'Word2007');
