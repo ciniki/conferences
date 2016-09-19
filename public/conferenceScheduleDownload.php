@@ -90,10 +90,10 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'conference');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2840', 'msg'=>'Conference not found', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3631', 'msg'=>'Conference not found', 'err'=>$rc['err']));
     }
     if( !isset($rc['conference']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2841', 'msg'=>'Unable to find Conference'));
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3632', 'msg'=>'Unable to find Conference'));
     }
     $conference = $rc['conference'];
     if( isset($maps['conference']['status'][$conference['status_text']]) ) {
