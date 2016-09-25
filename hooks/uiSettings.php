@@ -17,7 +17,7 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
     //
     // Setup the default response
     //
-    $rsp = array('stat'=>'ok', 'settings'=>array(), 'menu_items'=>array());
+    $rsp = array('stat'=>'ok', 'settings'=>array(), 'menu_items'=>array(), 'settings_menu_items'=>array());
 
     //
     // Get the settings
@@ -43,7 +43,17 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
             'edit'=>array('app'=>'ciniki.conferences.main'),
             );
         $rsp['menu_items'][] = $menu_item;
+
     } 
+    
+    if( isset($ciniki['business']['modules']['ciniki.conferences'])
+        && (isset($args['permissions']['owners'])
+            || isset($args['permissions']['resellers'])
+            || ($ciniki['session']['user']['perms']&0x01) == 0x01
+            )
+        ) {
+        $rsp['settings_menu_items'][] = array('priority'=>6200, 'label'=>'Conferences', 'edit'=>array('app'=>'ciniki.conferences.settings'));
+    }
 
     return $rsp;
 }
