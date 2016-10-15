@@ -1364,6 +1364,10 @@ function ciniki_conferences_main() {
             return false;
         } 
 
-        this.menu.open(cb);
+        if( args.conference_id != null && args.conference_id > 0 ) {
+            this.conference.open(cb, args.conference_id);
+        } else {
+            this.menu.open(cb);
+        }
     }
 };
