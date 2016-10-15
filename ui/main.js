@@ -121,11 +121,17 @@ function ciniki_conferences_main() {
                 }
                 return '';
             },
-            'tabs':{
-                'all':{'label':'All', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","");'},
-                'willregister':{'label':'Will Register', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","willregister");'},
-                'registered':{'label':'Registered', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","registered");'},
-                'notregistering':{'label':'Not Registering', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","notregistering");'},
+        'tabs':{
+            'all':{'label':'All', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","");'},
+            'willregister':{'label':'Will Register', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","willregister");'},
+            'registered':{'label':'Registered', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","registered");'},
+            'notregistering':{'label':'Not Registering', 'fn':'M.ciniki_conferences_main.conference.open(null,null,"attendees","notregistering");'},
+            }},
+        'attendee_buttons':{'label':'', 'aside':'yes',
+            'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
+            'buttons':{
+                'excelattendees':{'label':'Export Attendees (Excel)', 'fn':'M.ciniki_conferences_main.conference.attendeeExport(\'attendee\');'},
+                'excelpresenters':{'label':'Export Presenters (Excel)', 'fn':'M.ciniki_conferences_main.conference.attendeeExport(\'presenter\');'},
             }},
         'attendees':{'label':'Attendees', 'type':'simplegrid', 'num_cols':3, 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
@@ -417,6 +423,9 @@ function ciniki_conferences_main() {
             p.refresh();
             p.show(cb);
         });
+    };
+    this.conference.attendeeExport = function(t) {
+        M.api.openFile('ciniki.conferences.attendeeExport', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'type':t, 'output':'excel'});
     };
     this.conference.scheduleDownload = function() {
         M.api.openFile('ciniki.conferences.conferenceScheduleDownload', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'output':'word'});
