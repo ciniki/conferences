@@ -132,6 +132,7 @@ function ciniki_conferences_main() {
             'buttons':{
                 'excelattendees':{'label':'Export Attendees (Excel)', 'fn':'M.ciniki_conferences_main.conference.attendeeExport(\'attendee\');'},
                 'excelpresenters':{'label':'Export Presenters (Excel)', 'fn':'M.ciniki_conferences_main.conference.attendeeExport(\'presenter\');'},
+                'excelall':{'label':'Export All (Excel)', 'fn':'M.ciniki_conferences_main.conference.attendeeExport(\'all\');'},
             }},
         'attendees':{'label':'Attendees', 'type':'simplegrid', 'num_cols':3, 
             'visible':function() {return M.ciniki_conferences_main.conference.sections._tabs.selected=='attendees'?'yes':'no';},
