@@ -132,7 +132,7 @@ function ciniki_conferences_attendeeExport($ciniki) {
     } elseif( isset($args['type']) && $args['type'] == 'presenter' ) {
         $strsql .= "HAVING presenter = 'Presenter' ";
     }
-    $strsql .= "ORDER BY presenter, ciniki_customers.sort_name ";
+    $strsql .= "ORDER BY ciniki_customers.sort_name ";
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'attendees', 'fname'=>'id', 
             'fields'=>array('id', 'customer_id', 'display_name', 'sort_name', 'prefix', 'first', 'middle', 'last', 'suffix', 
