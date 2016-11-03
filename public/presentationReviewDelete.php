@@ -51,7 +51,7 @@ function ciniki_conferences_presentationReviewDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['presentationreview']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3261', 'msg'=>'Presentation Review does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.28', 'msg'=>'Presentation Review does not exist.'));
     }
     $presentationreview = $rc['presentationreview'];
 

@@ -135,10 +135,10 @@ function ciniki_conferences_presentationGet($ciniki) {
                  ),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3081', 'msg'=>'Presentation not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.25', 'msg'=>'Presentation not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['presentations'][0]) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3082', 'msg'=>'Unable to find Presentation'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.26', 'msg'=>'Unable to find Presentation'));
         }
         $presentation = $rc['presentations'][0];
         $presentation['display_title'] = sprintf("#%03d: ", $presentation['presentation_number']) . $presentation['title'];
@@ -183,7 +183,7 @@ function ciniki_conferences_presentationGet($ciniki) {
                 ),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3188', 'msg'=>'Unable to get list of reviews', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.27', 'msg'=>'Unable to get list of reviews', 'err'=>$rc['err']));
         }
         if( isset($rc['reviews']) ) {
             $presentation['reviews'] = $rc['reviews'];

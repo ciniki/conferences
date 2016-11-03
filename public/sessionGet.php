@@ -91,10 +91,10 @@ function ciniki_conferences_sessionGet($ciniki) {
                     )),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3599', 'msg'=>'Conference Session not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.42', 'msg'=>'Conference Session not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['sessions'][0]) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3600', 'msg'=>'Unable to find Conference Session'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.43', 'msg'=>'Unable to find Conference Session'));
         }
         $session = $rc['sessions'][0];
     }

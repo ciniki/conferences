@@ -75,7 +75,7 @@ function ciniki_conferences_reviewerPDF(&$ciniki) {
         $pdf = $rc['pdf'];
         if( $args['email'] == 'yes' && $args['subject'] != '' && $args['content'] != '' ) {
             if( $customer_email == '' ) {
-                return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3376', 'msg'=>'No email specified for this reviewer'));
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.36', 'msg'=>'No email specified for this reviewer'));
             }
 
             //
@@ -95,7 +95,7 @@ function ciniki_conferences_reviewerPDF(&$ciniki) {
                 ));
             if( $rc['stat'] != 'ok' ) {
                 ciniki_core_dbTransactionRollback($ciniki, 'ciniki.mail');
-                return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3377', 'msg'=>'Unable to create mail message.', 'err'=>$rc['err']));
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.37', 'msg'=>'Unable to create mail message.', 'err'=>$rc['err']));
             }
             $ciniki['emailqueue'][] = array('mail_id'=>$rc['id'], 'business_id'=>$args['business_id']);
 

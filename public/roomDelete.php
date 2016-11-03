@@ -51,7 +51,7 @@ function ciniki_conferences_roomDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['room']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3592', 'msg'=>'Conference Room does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.38', 'msg'=>'Conference Room does not exist.'));
     }
     $room = $rc['room'];
 

@@ -51,7 +51,7 @@ function ciniki_conferences_attendeeDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['attendee']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3500', 'msg'=>'Attendee does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.8', 'msg'=>'Attendee does not exist.'));
     }
     $attendee = $rc['attendee'];
 

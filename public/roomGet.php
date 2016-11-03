@@ -79,10 +79,10 @@ function ciniki_conferences_roomGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'room');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3593', 'msg'=>'Conference Room not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.39', 'msg'=>'Conference Room not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['room']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3594', 'msg'=>'Unable to find Conference Room'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.40', 'msg'=>'Unable to find Conference Room'));
         }
         $room = $rc['room'];
     }

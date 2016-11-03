@@ -58,7 +58,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['item']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3093', 'msg'=>'Presentation does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.33', 'msg'=>'Presentation does not exist'));
     }
     $item = $rc['item'];
 
@@ -84,7 +84,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3077', 'msg'=>'You already have a presentation with this title, please choose another title.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.34', 'msg'=>'You already have a presentation with this title, please choose another title.'));
         }
     }
 

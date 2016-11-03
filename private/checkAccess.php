@@ -26,7 +26,7 @@ function ciniki_conferences_checkAccess(&$ciniki, $business_id, $method) {
     $modules = $rc['modules'];
 
     if( !isset($rc['ruleset']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2834', 'msg'=>'No permissions granted'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.1', 'msg'=>'No permissions granted'));
     }
 
     //
@@ -50,7 +50,7 @@ function ciniki_conferences_checkAccess(&$ciniki, $business_id, $method) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.businesses', 'user');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2835', 'msg'=>'Access denied.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.2', 'msg'=>'Access denied.'));
     }
     //
     // If the user has permission, return ok
@@ -63,6 +63,6 @@ function ciniki_conferences_checkAccess(&$ciniki, $business_id, $method) {
     //
     // By default fail
     //
-    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2836', 'msg'=>'Access denied'));
+    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.3', 'msg'=>'Access denied'));
 }
 ?>

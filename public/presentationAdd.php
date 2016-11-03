@@ -66,7 +66,7 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
         return $rc;
     }
     if( $rc['num_rows'] > 0 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3091', 'msg'=>'You already have a presentation with this title, please choose another title.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.23', 'msg'=>'You already have a presentation with this title, please choose another title.'));
     }
 
     //

@@ -80,10 +80,10 @@ function ciniki_conferences_attendeeGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'attendee');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3501', 'msg'=>'Attendee not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.11', 'msg'=>'Attendee not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['attendee']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3502', 'msg'=>'Unable to find Attendee'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.12', 'msg'=>'Unable to find Attendee'));
         }
         $attendee = $rc['attendee'];
     }

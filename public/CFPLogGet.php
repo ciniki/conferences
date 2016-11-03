@@ -88,10 +88,10 @@ function ciniki_conferences_CFPLogGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'cfplog');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2847', 'msg'=>'CFP Log not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.5', 'msg'=>'CFP Log not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['cfplog']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2848', 'msg'=>'Unable to find CFP Log'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.6', 'msg'=>'Unable to find CFP Log'));
         }
         $cfplog = $rc['cfplog'];
 
@@ -130,7 +130,7 @@ function ciniki_conferences_CFPLogGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsList');
         $rc = ciniki_core_tagsList($ciniki, 'ciniki.conferences', $args['business_id'], 'ciniki_conferences_cfplog_tags', 10);
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2849', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.7', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
         }
         if( isset($rc['tags']) ) {
             $rsp['categories'] = $rc['tags'];

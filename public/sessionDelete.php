@@ -51,7 +51,7 @@ function ciniki_conferences_sessionDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['session']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3598', 'msg'=>'Conference Session does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.41', 'msg'=>'Conference Session does not exist.'));
     }
     $session = $rc['session'];
 

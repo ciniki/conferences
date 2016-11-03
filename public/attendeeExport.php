@@ -83,10 +83,10 @@ function ciniki_conferences_attendeeExport($ciniki) {
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'conference');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3699', 'msg'=>'Conference not found', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.9', 'msg'=>'Conference not found', 'err'=>$rc['err']));
     }
     if( !isset($rc['conference']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3698', 'msg'=>'Unable to find Conference'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.10', 'msg'=>'Unable to find Conference'));
     }
     $conference = $rc['conference'];
 

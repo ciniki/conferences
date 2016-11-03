@@ -72,10 +72,10 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
              ),
         ));
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3189', 'msg'=>'Presentations not found', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.44', 'msg'=>'Presentations not found', 'err'=>$rc['err']));
     }
     if( !isset($rc['presentations']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3247', 'msg'=>'Unable to find presentations'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.45', 'msg'=>'Unable to find presentations'));
     }
     $presentations = $rc['presentations'];
     foreach($presentations as $pid => $presentation) {
@@ -109,7 +109,7 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
         return $rc;
     }
     if( !isset($rc['conference']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3248', 'msg'=>'Unable to find conference'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.46', 'msg'=>'Unable to find conference'));
     }
     $conference = $rc['conference'];
 

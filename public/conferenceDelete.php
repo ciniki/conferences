@@ -51,7 +51,7 @@ function ciniki_conferences_conferenceDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['conference']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2851', 'msg'=>'Airlock does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.16', 'msg'=>'Airlock does not exist.'));
     }
     $conference = $rc['conference'];
 
@@ -68,7 +68,7 @@ function ciniki_conferences_conferenceDelete(&$ciniki) {
         return $rc;
     }
     if( isset($rc['conference']['num_logs']) && $rc['conference']['num_logs'] > 0 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2850', 'msg'=>'Conference still has CFP logs.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.17', 'msg'=>'Conference still has CFP logs.'));
     }
 
     //
