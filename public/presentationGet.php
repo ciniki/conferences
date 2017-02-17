@@ -73,11 +73,16 @@ function ciniki_conferences_presentationGet($ciniki) {
     if( $args['presentation_id'] == 0 ) {
         $presentation = array('id'=>0,
             'conference_id'=>'',
-            'customer_id'=>'',
+            'customer1_id'=>'',
+            'customer2_id'=>'',
+            'customer3_id'=>'',
+            'customer4_id'=>'',
+            'customer5_id'=>'',
             'session_id'=>0,
             'presentation_number'=>'',
             'presentation_type'=>'',
             'status'=>'10',
+            'status_text'=>'Submitted',
             'registration'=>'0',
             'submission_date'=>'',
             'field'=>'',
@@ -94,29 +99,53 @@ function ciniki_conferences_presentationGet($ciniki) {
     else {
         $strsql = "SELECT ciniki_conferences_presentations.id, "
             . "ciniki_conferences_presentations.conference_id, "
-            . "ciniki_conferences_presentations.customer_id, "
+            . "ciniki_conferences_presentations.customer1_id, "
+            . "ciniki_conferences_presentations.customer2_id, "
+            . "ciniki_conferences_presentations.customer3_id, "
+            . "ciniki_conferences_presentations.customer4_id, "
+            . "ciniki_conferences_presentations.customer5_id, "
             . "ciniki_conferences_presentations.session_id, "
-            . "ciniki_customers.display_name, "
+            . "ciniki_conferences_presentations.presenters, "
             . "ciniki_conferences_presentations.presentation_number, "
             . "ciniki_conferences_presentations.presentation_type, "
             . "ciniki_conferences_presentations.presentation_type AS presentation_type_text, "
             . "ciniki_conferences_presentations.status, "
             . "ciniki_conferences_presentations.status AS status_text, "
-            . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration, "
-            . "IFNULL(ciniki_conferences_attendees.status, 0) AS registration_text, "
+            . "IFNULL(a1.status, 0) AS registration1, "
+            . "IFNULL(a1.status, 0) AS registration1_text, "
+            . "IFNULL(a2.status, 0) AS registration2, "
+            . "IFNULL(a2.status, 0) AS registration2_text, "
+            . "IFNULL(a3.status, 0) AS registration3, "
+            . "IFNULL(a3.status, 0) AS registration3_text, "
+            . "IFNULL(a4.status, 0) AS registration4, "
+            . "IFNULL(a4.status, 0) AS registration4_text, "
+            . "IFNULL(a5.status, 0) AS registration5, "
+            . "IFNULL(a5.status, 0) AS registration5_text, "
             . "ciniki_conferences_presentations.submission_date, "
             . "ciniki_conferences_presentations.field, "
             . "ciniki_conferences_presentations.title, "
             . "ciniki_conferences_presentations.permalink, "
             . "ciniki_conferences_presentations.description "
             . "FROM ciniki_conferences_presentations "
-            . "LEFT JOIN ciniki_conferences_attendees ON ("
-                . "ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
-                . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "LEFT JOIN ciniki_conferences_attendees AS a1 ON ("
+                . "ciniki_conferences_presentations.customer1_id = a1.customer_id "
+                . "AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                 . ") "
-            . "LEFT JOIN ciniki_customers ON ("
-                . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
-                . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "LEFT JOIN ciniki_conferences_attendees AS a2 ON ("
+                . "ciniki_conferences_presentations.customer2_id = a2.customer_id "
+                . "AND a2.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . ") "
+            . "LEFT JOIN ciniki_conferences_attendees AS a3 ON ("
+                . "ciniki_conferences_presentations.customer3_id = a3.customer_id "
+                . "AND a3.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . ") "
+            . "LEFT JOIN ciniki_conferences_attendees AS a4 ON ("
+                . "ciniki_conferences_presentations.customer4_id = a4.customer_id "
+                . "AND a4.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . ") "
+            . "LEFT JOIN ciniki_conferences_attendees AS a5 ON ("
+                . "ciniki_conferences_presentations.customer5_id = a5.customer_id "
+                . "AND a5.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                 . ") "
             . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . "AND ciniki_conferences_presentations.id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
@@ -124,12 +153,20 @@ function ciniki_conferences_presentationGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
             array('container'=>'presentations', 'fname'=>'id', 
-                'fields'=>array('id', 'conference_id', 'customer_id', 'session_id', 'display_name', 'presentation_number', 'presentation_type', 'presentation_type_text',
-                    'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'permalink', 'description'),
+                'fields'=>array('id', 'conference_id', 'customer1_id', 'customer2_id', 'customer3_id', 'customer4_id', 'customer5_id',
+                    'session_id', 'presenters', 'presentation_number', 'presentation_type', 'presentation_type_text',
+                    'status', 'status_text', 
+                    'registration1', 'registration1_text', 'registration2', 'registration2_text', 'registration3', 'registration3_text', 
+                    'registration4', 'registration4_text', 'registration5', 'registration5_text', 
+                    'submission_date', 'field', 'title', 'permalink', 'description'),
                 'maps'=>array(
                     'presentation_type_text'=>$maps['presentation']['presentation_type'],
                     'status_text'=>$maps['presentation']['status'],
-                    'registration_text'=>$maps['attendee']['status'],
+                    'registration1_text'=>$maps['attendee']['status'],
+                    'registration2_text'=>$maps['attendee']['status'],
+                    'registration3_text'=>$maps['attendee']['status'],
+                    'registration4_text'=>$maps['attendee']['status'],
+                    'registration5_text'=>$maps['attendee']['status'],
                     ),
                 'utctotz'=>array('submission_date'=>array('format'=>$datetime_format, 'timezone'=>$intl_timezone)),
                  ),
@@ -146,17 +183,21 @@ function ciniki_conferences_presentationGet($ciniki) {
         //
         // Get the customer details
         //
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
-        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
-            array('customer_id'=>$presentation['customer_id'], 'phones'=>'yes', 'emails'=>'yes', 'addresses'=>'no', 'subscriptions'=>'no', 'full_bio'=>'yes'));
-        if( $rc['stat'] != 'ok' ) {
-            return $rc;
-        }
-        $presentation['customer_details'] = $rc['details'];
-        if( isset($rc['customer']['full_bio']) ) {
-            $presentation['full_bio'] = $rc['customer']['full_bio'];
-        } else {
-            $presentation['full_bio'] = '';
+        for($i = 1; $i <= 5; $i++) {
+            if( $presentation['customer' . $i . '_id'] > 0 ) {
+                ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
+                $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
+                    array('customer_id'=>$presentation['customer' . $i . '_id'], 'phones'=>'yes', 'emails'=>'yes', 'addresses'=>'no', 'subscriptions'=>'no', 'full_bio'=>'yes'));
+                if( $rc['stat'] != 'ok' ) {
+                    return $rc;
+                }
+                $presentation['customer' . $i . '_details'] = $rc['details'];
+                if( isset($rc['customer']['full_bio']) ) {
+                    $presentation['customer' . $i . '_bio'] = $rc['customer']['full_bio'];
+                } else {
+                    $presentation['customer' . $i . '_bio'] = '';
+                }
+            }
         }
 
         //

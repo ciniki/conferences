@@ -19,7 +19,11 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
         'presentation_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Presentation'),
         'conference_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Conference'),
-        'customer_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'customer1_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'customer2_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'customer3_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'customer4_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'customer5_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
         'presentation_type'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Type'),
         'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'),
         'session_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Session'),
@@ -48,7 +52,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     // Check if item exists
     //
-    $strsql = "SELECT id, customer_id, conference_id "
+    $strsql = "SELECT id, customer1_id, customer2_id, customer3_id, customer4_id, customer5_id, conference_id "
         . "FROM ciniki_conferences_presentations "
         . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
@@ -113,6 +117,9 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     // Check if registration set
     // 
+/*
+// FIXME: Add code for 5 customers with presentation
+//
     if( isset($args['registration']) && $args['registration'] != '' ) {
         //
         // Check if customer already exists in attendees
@@ -135,7 +142,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
             ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
             $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
                 'conference_id'=>$item['conference_id'],
-                'customer_id'=>(isset($args['customer_id']) ? $args['customer_id'] : $item['customer_id']),
+                'customer_id'=>(isset($args['customer1_id']) ? $args['customer1_id'] : $item['customer1_id']),
                 'status'=>$args['registration'],
                 ), 0x04);
             if( $rc['stat'] != 'ok' ) {
@@ -156,7 +163,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
             }
         }
     }
-
+*/
     //
     // Commit the transaction
     //

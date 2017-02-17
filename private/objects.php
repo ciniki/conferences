@@ -55,7 +55,12 @@ function ciniki_conferences_objects($ciniki) {
         'table'=>'ciniki_conferences_presentations',
         'fields'=>array(
             'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
-            'customer_id'=>array('name'=>'Customer', 'ref'=>'ciniki.customers.customer'),
+            'customer1_id'=>array('name'=>'Presenter 1', 'ref'=>'ciniki.customers.customer'),
+            'customer2_id'=>array('name'=>'Presenter 2', 'ref'=>'ciniki.customers.customer', 'default'=>'0'),
+            'customer3_id'=>array('name'=>'Presenter 3', 'ref'=>'ciniki.customers.customer', 'default'=>'0'),
+            'customer4_id'=>array('name'=>'Presenter 4', 'ref'=>'ciniki.customers.customer', 'default'=>'0'),
+            'customer5_id'=>array('name'=>'Presenter 5', 'ref'=>'ciniki.customers.customer', 'default'=>'0'),
+            'presenters'=>array('name'=>'Presenters', 'default'=>''),
             'presentation_number'=>array('name'=>'Type', 'default'=>'0'),
             'presentation_type'=>array('name'=>'Type'),
             'status'=>array('name'=>'Status', 'default'=>'10'),

@@ -52,7 +52,7 @@ function ciniki_conferences_presentationList($ciniki) {
     //
     $strsql = "SELECT ciniki_conferences_presentations.id, "
         . "ciniki_conferences_presentations.conference_id, "
-        . "ciniki_conferences_presentations.customer_id, "
+        . "ciniki_conferences_presentations.customer1_id, "
         . "ciniki_customers.display_name, "
         . "ciniki_customer_emails.email, "
         . "ciniki_conferences_presentations.presentation_number, "
@@ -66,7 +66,7 @@ function ciniki_conferences_presentationList($ciniki) {
         . "ciniki_conferences_presentations.description "
         . "FROM ciniki_conferences_presentations "
         . "LEFT JOIN ciniki_customers ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+            . "ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
             . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customer_emails ON ("
@@ -83,7 +83,7 @@ function ciniki_conferences_presentationList($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'presentations', 'fname'=>'id', 
-            'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_number', 'presentation_type', 
+            'fields'=>array('id', 'conference_id', 'customer1_id', 'presentation_number', 'presentation_type', 
                 'status', 'status_text', 'submission_date', 'field', 'title', 'display_name', 'permalink', 'description'),
              'maps'=>array(
                 'status_text'=>$maps['presentation']['status'],

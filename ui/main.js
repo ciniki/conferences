@@ -278,11 +278,11 @@ function ciniki_conferences_main() {
             switch (j) {
                 case 0: return d.room;
                 case 1: return '<span class="maintext">' + d.start_time + ' - ' + d.end_time + '</span><span class="subtext">' + d.start_date + '</span>';
-                case 2: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+                case 2: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.presenters + '</span>';
             }
         } else if( s == 'unassignedpresentations' ) {
             switch (j) {
-                case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+                case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.presenters + '</span>';
                 case 1: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
             }
         } else if( s == 'sessions' ) {
@@ -311,7 +311,7 @@ function ciniki_conferences_main() {
             }
         } else if( s == 'presentations' || s == 'presentationsearch' ) {
             switch (j) {
-                case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.display_name + '</span>';
+                case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.presenters + '</span>';
                 case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + d.submission_date + '</span>';
                 case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
             }
@@ -808,20 +808,51 @@ function ciniki_conferences_main() {
     //
     // The presentation display panel 
     //
-    this.presentation = new M.panel('Presentation', 'ciniki_conferences_main', 'presentation', 'mc', 'large', 'sectioned', 'ciniki.conferences.main.presentation');
+    this.presentation = new M.panel('Presentation', 'ciniki_conferences_main', 'presentation', 'mc', 'medium mediumaside', 'sectioned', 'ciniki.conferences.main.presentation');
     this.presentation.data = {};
     this.presentation.presentation_id = 0;
     this.presentation.sections = {
+        'customer1_details':{'label':'Presenter 1', 'type':'simplegrid', 'num_cols':2, 'aside':'yes', 
+            'cellClasses':['label',''],
+            },
+        'customer1_bio':{'label':'Bio', 'type':'html', 'aside':'yes'},
+        'customer2_details':{'label':'Presenter 2', 'type':'simplegrid', 'num_cols':2, 'aside':'yes', 
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer2_details != null ? 'yes' : 'no'); },
+            'cellClasses':['label',''],
+            },
+        'customer2_bio':{'label':'Bio', 'type':'html', 'aside':'yes',
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer2_details != null ? 'yes' : 'no'); },
+            },
+        'customer3_details':{'label':'Presenter 3', 'type':'simplegrid', 'num_cols':2, 'aside':'yes', 
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer3_details != null ? 'yes' : 'no'); },
+            'cellClasses':['label',''],
+            },
+        'customer3_bio':{'label':'Bio', 'type':'html', 'aside':'yes',
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer3_details != null ? 'yes' : 'no'); },
+            },
+        'customer4_details':{'label':'Presenter 4', 'type':'simplegrid', 'num_cols':2, 'aside':'yes', 
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer4_details != null ? 'yes' : 'no'); },
+            'cellClasses':['label',''],
+            },
+        'customer4_bio':{'label':'Bio', 'type':'html', 'aside':'yes',
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer4_details != null ? 'yes' : 'no'); },
+            },
+        'customer5_details':{'label':'Presenter 5', 'type':'simplegrid', 'num_cols':2, 'aside':'yes', 
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer5_details != null ? 'yes' : 'no'); },
+            'cellClasses':['label',''],
+            },
+        'customer5_bio':{'label':'Bio', 'type':'html', 'aside':'yes',
+            'visible':function() { return (M.ciniki_conferences_main.presentation.data.customer5_details != null ? 'yes' : 'no'); },
+            },
         'info':{'label':'Presentation', 'list':{
             'display_title':{'label':'Title'},
-            'display_name':{'label':'Presenter'},
+            'presenters':{'label':'Presenters'},
             'status_text':{'label':'Status'},
-            'registration_text':{'label':'Registration'},
+//            'registration_text':{'label':'Registration'},
             'field':{'label':'Field'},
             'presentation_type_text':{'label':'Type'},
             'submission_date':{'label':'Submitted On'},
             }},
-        'full_bio':{'label':'Bio', 'type':'html'},
         'description':{'label':'Description', 'type':'html'},
         'reviews':{'label':'Reviewers', 'type':'simplegrid', 'num_cols':2,
             'addTxt':'Add Reviewer',
@@ -833,7 +864,7 @@ function ciniki_conferences_main() {
     };
     this.presentation.sectionData = function(s) {
         if( s == 'info' ) { return this.sections[s].list; }
-//        if( s == 'description' ) { return this.data[s].replace(/\n/g, '<br/>'); }
+        if( s == 'description' ) { return this.data[s].replace(/\n/g, '<br/>'); }
         if( s == 'full_bio' ) { 
             if( this.data[s] != null ) {
                 return this.data[s].replace(/\n/g, '<br/>'); 
@@ -857,6 +888,12 @@ function ciniki_conferences_main() {
         return this.data[i];
     };
     this.presentation.cellValue = function(s, i, j, d) {
+        if( s == 'customer1_details' || s == 'customer2_details' || s == 'customer3_details' || s == 'customer4_details' || s == 'customer5_details' ) {
+            switch (j) {
+                case 0: return d.detail.label;
+                case 1: return (d.detail.label == 'Email'?M.linkEmail(d.detail.value):d.detail.value);
+            }
+        }
         if( s == 'reviews' ) {
             switch (j) {
                 case 0: return d.display_name;
