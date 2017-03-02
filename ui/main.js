@@ -936,7 +936,7 @@ function ciniki_conferences_main() {
                         M.api.err(rsp);
                         return false;
                     }
-                    M.ciniki_conferences_main.presentation.show();
+                    M.ciniki_conferences_main.presentation.open();
                 });
         }
     };
