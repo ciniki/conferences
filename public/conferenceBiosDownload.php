@@ -111,7 +111,7 @@ function ciniki_conferences_conferenceBiosDownload($ciniki) {
         . "ciniki_conferences_sessions.session_start AS start_date, "
         . "ciniki_conferences_sessions.session_end AS end_time, "
         . "IFNULL(ciniki_conferences_presentations.id, 0) AS presentation_id, "
-        . "IFNULL(ciniki_conferences_presentations.customer1_id, 0) AS customer_id, "
+        . "IFNULL(ciniki_customers.id, 0) AS customer_id, "
         . "IFNULL(ciniki_conferences_presentations.presentation_number, '') AS presentation_number, "
         . "IFNULL(ciniki_conferences_presentations.title, '') AS presentation_title, "
         . "IFNULL(ciniki_conferences_presentations.description, '') AS presentation_description, "
@@ -131,12 +131,22 @@ function ciniki_conferences_conferenceBiosDownload($ciniki) {
             . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_conferences_attendees ON ("
-            . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
+            . "(ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
+                . " OR ciniki_conferences_presentations.customer2_id = ciniki_conferences_attendees.customer_id "
+                . " OR ciniki_conferences_presentations.customer3_id = ciniki_conferences_attendees.customer_id "
+                . " OR ciniki_conferences_presentations.customer4_id = ciniki_conferences_attendees.customer_id "
+                . " OR ciniki_conferences_presentations.customer5_id = ciniki_conferences_attendees.customer_id "
+                . ") "
             . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
             . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customers ON ("
-            . "ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
+            . "(ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer2_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer3_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer4_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer5_id = ciniki_customers.id "
+                . ") "
             . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
@@ -144,7 +154,8 @@ function ciniki_conferences_conferenceBiosDownload($ciniki) {
         . "ORDER BY ciniki_conferences_sessions.session_start, "
             . "ciniki_conferences_rooms.name, "
             . "ciniki_conferences_rooms.sequence, "
-            . "ciniki_conferences_presentations.title "
+            . "ciniki_conferences_presentations.title, "
+            . "customer_id "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
@@ -156,7 +167,7 @@ function ciniki_conferences_conferenceBiosDownload($ciniki) {
                 ),
             ),
         array('container'=>'rooms', 'fname'=>'room_id', 'fields'=>array('id'=>'room_id', 'name'=>'room', 'session_name'=>'name', 'presentation_id')),
-        array('container'=>'presentations', 'fname'=>'presentation_id', 
+        array('container'=>'presentations', 'fname'=>'customer_id', 
             'fields'=>array('id', 'conference_id', 'room_id', 'room', 'sequence', 'name', 'start_time', 'start_date', 'end_time',
                 'presentation_id', 'customer_id', 'presentation_number', 'presentation_title', 'presentation_description', 
                 'display_name', 'full_bio', 'status', 'status_text', 'registration', 'registration_text'),
