@@ -138,7 +138,6 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
             if( $rc['stat'] != 'ok' ) {
                 return $rc;
             }
-            $attendee = $rc['item'];
             if( !isset($rc['item']) ) {
                 //
                 // Add the attendee
@@ -154,16 +153,19 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
                     return $rc;
                 }
                 $attendee_id = $rc['id'];
-            } elseif( $attendee['status'] != $args['registration' . $i] ) {
-                //
-                // Update the attendee
-                //
-                $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
-                    'status'=>$args['registration' . $i],
-                    ), 0x04);
-                if( $rc['stat'] != 'ok' ) {
-                    ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
-                    return $rc;
+            } else {
+                $attendee = $rc['item'];
+                if( $attendee['status'] != $args['registration' . $i] ) {
+                    //
+                    // Update the attendee
+                    //
+                    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
+                        'status'=>$args['registration' . $i],
+                        ), 0x04);
+                    if( $rc['stat'] != 'ok' ) {
+                        ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+                        return $rc;
+                    }
                 }
             }
         }
