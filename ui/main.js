@@ -283,7 +283,8 @@ function ciniki_conferences_main() {
         } else if( s == 'unassignedpresentations' ) {
             switch (j) {
                 case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.presenters + '</span>';
-                case 1: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
+//                case 1: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
+                case 1: return '<span class="maintext">' + d.status_text + '</span>';
             }
         } else if( s == 'sessions' ) {
             switch (j) {
@@ -313,7 +314,8 @@ function ciniki_conferences_main() {
             switch (j) {
                 case 0: return '<span class="maintext">' + d.display_title + '</span><span class="subtext">' + d.presenters + '</span>';
                 case 1: return '<span class="maintext">' + d.votes_received + '/' + d.total_reviews + '</span><span class="subtext">' + d.submission_date + '</span>';
-                case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
+//                case 2: return '<span class="maintext">' + d.status_text + '</span><span class="subtext">' + d.registration_text + '</span>';
+                case 2: return '<span class="maintext">' + d.status_text + '</span>';
             }
         }
     };
@@ -973,10 +975,11 @@ function ciniki_conferences_main() {
         'general':{'label':'Presentation', 'aside':'yes', 'fields':{
             'title':{'label':'Title', 'type':'text'},
             'status':{'label':'Status', 'type':'toggle', 'toggles':{'10':'Submitted', '30':'Accepted', '50':'Rejected'}},
-            'registration':{'label':'Registration', 'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}},
             'field':{'label':'Field', 'type':'text'},
             'presentation_type':{'label':'Type', 'type':'toggle', 'toggles':{'10':'Individual Paper', '20':'Panel'}},
             }}, 
+        '_registrations':{'label':'Registrations', 'aside':'yes', 'fields':{
+            }},
         '_session':{'label':'Session', 'aside':'yes', 
             'active':function() { return M.ciniki_conferences_main.presentationedit.presentation_id > 0 ? 'yes' : 'no'; },
             'fields':{
@@ -1007,6 +1010,27 @@ function ciniki_conferences_main() {
             p.data = rsp.presentation;
             rsp.sessions.unshift({'id':0, 'name':'None Assigned'});
             p.sections._session.fields.session_id.options = rsp.sessions;
+            p.sections._registrations.fields = {};
+            if( rsp.presentation.customer1_id > 0 ) {
+                p.sections._registrations.fields['registration1'] = {'label':rsp.presentation['customer1_first'],
+                    'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}};
+            }
+            if( rsp.presentation.customer2_id > 0 ) {
+                p.sections._registrations.fields['registration2'] = {'label':rsp.presentation['customer2_first'],
+                    'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}};
+            }
+            if( rsp.presentation.customer3_id > 0 ) {
+                p.sections._registrations.fields['registration3'] = {'label':rsp.presentation['customer3_first'],
+                    'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}};
+            }
+            if( rsp.presentation.customer4_id > 0 ) {
+                p.sections._registrations.fields['registration4'] = {'label':rsp.presentation['customer4_first'],
+                    'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}};
+            }
+            if( rsp.presentation.customer5_id > 0 ) {
+                p.sections._registrations.fields['registration5'] = {'label':rsp.presentation['customer5_first'],
+                    'type':'toggle', 'toggles':{'0':'Unknown', '10':'Will Register', '30':'Registered', '50':'Not Registering'}};
+            }
             p.refresh();
             p.show(cb);
         });

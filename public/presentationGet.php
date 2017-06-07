@@ -191,6 +191,7 @@ function ciniki_conferences_presentationGet($ciniki) {
                 if( $rc['stat'] != 'ok' ) {
                     return $rc;
                 }
+                $presentation['customer' . $i . '_first'] = $rc['customer']['first'];
                 $presentation['customer' . $i . '_details'] = $rc['details'];
                 if( isset($rc['customer']['full_bio']) ) {
                     $presentation['customer' . $i . '_bio'] = $rc['customer']['full_bio'];

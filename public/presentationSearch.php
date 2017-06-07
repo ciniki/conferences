@@ -75,7 +75,7 @@ function ciniki_conferences_presentationSearch($ciniki) {
     //
     $strsql = "SELECT ciniki_conferences_presentations.id, "
         . "ciniki_conferences_presentations.conference_id, "
-        . "ciniki_conferences_presentations.customer_id, "
+        . "ciniki_conferences_presentations.presenters, "
         . "ciniki_customers.display_name, "
         . "ciniki_conferences_presentations.presentation_number, "
         . "ciniki_conferences_presentations.presentation_type, "
@@ -92,12 +92,22 @@ function ciniki_conferences_presentationSearch($ciniki) {
         . "COUNT(ciniki_conferences_presentation_reviews.id) AS num_votes "
         . "FROM ciniki_conferences_presentations "
         . "LEFT JOIN ciniki_conferences_attendees ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
+            . "(ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
+                . "OR ciniki_conferences_presentations.customer2_id = ciniki_conferences_attendees.customer_id "
+                . "OR ciniki_conferences_presentations.customer3_id = ciniki_conferences_attendees.customer_id "
+                . "OR ciniki_conferences_presentations.customer4_id = ciniki_conferences_attendees.customer_id "
+                . "OR ciniki_conferences_presentations.customer5_id = ciniki_conferences_attendees.customer_id "
+                . ") "
             . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
             . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customers ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+            . "(ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer2_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer3_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer4_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer5_id = ciniki_customers.id "
+                . ") "
             . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_conferences_presentation_reviews ON ("
@@ -113,8 +123,8 @@ function ciniki_conferences_presentationSearch($ciniki) {
         $strsql .= "AND ciniki_conferences_presentations.presentation_type = '" . ciniki_core_dbQuote($ciniki, $args['presentation_type']) . "' ";
     }
     $strsql .= "AND ("
-        . "ciniki_customers.display_name LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
-        . "OR ciniki_customers.display_name LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+        . "ciniki_conferences_presentations.presenters LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+        . "OR ciniki_conferences_presentations.presenters LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
         . "OR ciniki_conferences_presentations.title LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
         . "OR ciniki_conferences_presentations.title LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
         . ") "
@@ -123,7 +133,7 @@ function ciniki_conferences_presentationSearch($ciniki) {
     $strsql .= "ORDER BY submission_date ";
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
         array('container'=>'presentations', 'fname'=>'id', 
-            'fields'=>array('id', 'conference_id', 'customer_id', 'presentation_type', 'presentation_number',
+            'fields'=>array('id', 'conference_id', 'presenters', 'presentation_type', 'presentation_number',
                 'status', 'status_text', 'registration', 'registration_text', 'submission_date', 'field', 'title', 'display_name', 'permalink'),
              'utctotz'=>array('submission_date'=>array('format'=>'M j', 'timezone'=>$intl_timezone)),
              'maps'=>array(

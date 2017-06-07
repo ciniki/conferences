@@ -24,6 +24,11 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         'customer3_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
         'customer4_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
         'customer5_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
+        'registration1'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
+        'registration2'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
+        'registration3'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
+        'registration4'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
+        'registration5'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Registration'),
         'presentation_type'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Type'),
         'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'),
         'session_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Session'),
@@ -117,53 +122,53 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     // Check if registration set
     // 
-/*
-// FIXME: Add code for 5 customers with presentation
-//
-    if( isset($args['registration']) && $args['registration'] != '' ) {
-        //
-        // Check if customer already exists in attendees
-        //
-        $strsql = "SELECT id, conference_id, customer_id, status "
-            . "FROM ciniki_conferences_attendees "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-            . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $item['conference_id']) . "' "
-            . "AND customer_id = '" . ciniki_core_dbQuote($ciniki, isset($args['customer_id']) ? $args['customer_id'] : $item['customer_id']) . "' "
-            . "";
-        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
-        if( $rc['stat'] != 'ok' ) {
-            return $rc;
-        }
-        $attendee = $rc['item'];
-        if( !isset($rc['item']) ) {
+    for($i = 1; $i < 6; $i++) {
+        if( isset($args['registration' . $i]) && $args['registration' . $i] != '' ) {
+            $customer_id = (isset($args['customer' . $i . '_id']) ? $args['customer' . $i . '_id'] : $item['customer' . $i . '_id']);
             //
-            // Add the attendee
+            // Check if customer already exists in attendees
             //
-            ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-            $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
-                'conference_id'=>$item['conference_id'],
-                'customer_id'=>(isset($args['customer1_id']) ? $args['customer1_id'] : $item['customer1_id']),
-                'status'=>$args['registration'],
-                ), 0x04);
+            $strsql = "SELECT id, conference_id, customer_id, status "
+                . "FROM ciniki_conferences_attendees "
+                . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $item['conference_id']) . "' "
+                . "AND customer_id = '" . ciniki_core_dbQuote($ciniki, $customer_id) . "' "
+                . "";
+            $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
             if( $rc['stat'] != 'ok' ) {
-                ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
                 return $rc;
             }
-            $attendee_id = $rc['id'];
-        } elseif( $attendee['status'] != $args['registration'] ) {
-            //
-            // Update the attendee
-            //
-            $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
-                'status'=>$args['registration'],
-                ), 0x04);
-            if( $rc['stat'] != 'ok' ) {
-                ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
-                return $rc;
+            $attendee = $rc['item'];
+            if( !isset($rc['item']) ) {
+                //
+                // Add the attendee
+                //
+                ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
+                $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
+                    'conference_id'=>$item['conference_id'],
+                    'customer_id'=>$customer_id,
+                    'status'=>$args['registration' . $i],
+                    ), 0x04);
+                if( $rc['stat'] != 'ok' ) {
+                    ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+                    return $rc;
+                }
+                $attendee_id = $rc['id'];
+            } elseif( $attendee['status'] != $args['registration' . $i] ) {
+                //
+                // Update the attendee
+                //
+                $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
+                    'status'=>$args['registration' . $i],
+                    ), 0x04);
+                if( $rc['stat'] != 'ok' ) {
+                    ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
+                    return $rc;
+                }
             }
         }
     }
-*/
+
     //
     // Commit the transaction
     //
