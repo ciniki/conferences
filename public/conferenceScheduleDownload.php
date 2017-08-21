@@ -189,9 +189,10 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
     //
     // Generate the word file
     //
-    require_once($ciniki['config']['core']['lib_dir'] . '/PHPWord/src/PhpWord/Autoloader.php');
-    \PhpOffice\PhpWord\Autoloader::register();
-    require($ciniki['config']['core']['lib_dir'] . '/PHPWord/src/PhpWord/PhpWord.php');
+//    require_once($ciniki['config']['core']['lib_dir'] . '/PHPWord/src/PhpWord/Autoloader.php');
+//    \PhpOffice\PhpWord\Autoloader::register();
+//    require($ciniki['config']['core']['lib_dir'] . '/PHPWord/src/PhpWord/PhpWord.php');
+    require_once($ciniki['config']['core']['lib_dir'] . '/PHPWord/bootstrap.php');
 
     $PHPWord = new \PhpOffice\PhpWord\PhpWord();
     $PHPWord->addTitleStyle(1, array('bold'=>true, 'size'=>18), array('spaceBefore'=>240, 'spaceAfter'=>120));
