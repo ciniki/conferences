@@ -494,6 +494,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                     . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
                     . ") "
                 . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "AND ciniki_conferences_presentations.session_id = 0 "
                 . "AND ciniki_conferences_presentations.status = 30 "
                 . "HAVING registration = 30 "

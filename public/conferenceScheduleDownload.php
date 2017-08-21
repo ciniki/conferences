@@ -111,10 +111,11 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         . "ciniki_conferences_sessions.session_start AS start_date, "
         . "ciniki_conferences_sessions.session_end AS end_time, "
         . "IFNULL(ciniki_conferences_presentations.id, 0) AS presentation_id, "
-        . "IFNULL(ciniki_conferences_presentations.customer_id, 0) AS customer_id, "
+        . "IFNULL(ciniki_conferences_presentations.customer1_id, 0) AS customer_id, "
         . "IFNULL(ciniki_conferences_presentations.presentation_number, '') AS presentation_number, "
         . "IFNULL(ciniki_conferences_presentations.title, '') AS presentation_title, "
         . "IFNULL(ciniki_conferences_presentations.description, '') AS presentation_description, "
+        . "IFNULL(ciniki_customers.id, 0) AS customer_id, "
         . "IFNULL(ciniki_customers.display_name, '') AS display_name, "
         . "IFNULL(ciniki_conferences_presentations.status, 0) AS status, "
         . "IFNULL(ciniki_conferences_presentations.status, '') AS status_text, "
@@ -130,12 +131,17 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
             . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_conferences_attendees ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_conferences_attendees.customer_id "
+            . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
             . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
             . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customers ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+            . "(ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer2_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer3_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer4_id = ciniki_customers.id "
+                . "OR ciniki_conferences_presentations.customer5_id = ciniki_customers.id "
+                . ") "
             . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
             . ") "
         . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
@@ -157,7 +163,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         array('container'=>'rooms', 'fname'=>'room_id', 'fields'=>array('id'=>'room_id', 'name'=>'room', 'session_name'=>'name', 'presentation_id')),
         array('container'=>'presentations', 'fname'=>'presentation_id', 
             'fields'=>array('id', 'conference_id', 'room_id', 'room', 'sequence', 'name', 'start_time', 'start_date', 'end_time',
-                'presentation_id', 'customer_id', 'presentation_number', 'presentation_title', 'presentation_description', 'display_name', 'status', 'status_text', 'registration', 'registration_text'),
+                'presentation_id', 'presentation_number', 'presentation_title', 'presentation_description', 'display_name', 'status', 'status_text', 'registration', 'registration_text'),
             'utctotz'=>array(
                 'start_time'=>array('format'=>$time_format, 'timezone'=>$intl_timezone),
                 'start_date'=>array('format'=>$date_format, 'timezone'=>$intl_timezone),
@@ -167,6 +173,8 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                 'status_text'=>$maps['presentation']['status'],
                 'registration_text'=>$maps['attendee']['status'],
                 )),
+        array('container'=>'customers', 'fname'=>'customer_id', 
+            'fields'=>array('display_name')),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -253,6 +261,16 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                     $presentation_number = 1;
                     $presentation_info = '';
                     foreach($room['presentations'] as $presentation) {
+                        //
+                        // Build list of presenters
+                        //
+                        if( isset($presentation['customers']) ) {
+                            $presentation['display_name'] = '';
+                            foreach($presentation['customers'] as $customer) {
+                                $presentation['display_name'] .= ($presentation['display_name'] != '' ? ', ' : '') . $customer['display_name'];
+                            }
+                        }
+                        
                         if( $presentation_number > 1 ) {
                             $presentation_info .= "; ";
                         }
@@ -293,6 +311,15 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                 $section->addTitle($session_number . ". " . $room['session_name'], 1);
                 if( isset($room['presentations']) && $room['presentation_id'] != 0 ) {
                     foreach($room['presentations'] as $pid => $presentation) {
+                        //
+                        // Build list of presenters
+                        //
+                        if( isset($presentation['customers']) ) {
+                            $presentation['display_name'] = '';
+                            foreach($presentation['customers'] as $customer) {
+                                $presentation['display_name'] .= ($presentation['display_name'] != '' ? ', ' : '') . $customer['display_name'];
+                            }
+                        }
                         $section->addTitle($presentation['display_name'], 2);
                         $section->addTitle(htmlspecialchars($presentation['presentation_title']), 3);
                         $lines = explode("\n", $presentation['presentation_description']);
