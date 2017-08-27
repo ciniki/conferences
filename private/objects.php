@@ -138,7 +138,7 @@ function ciniki_conferences_objects($ciniki) {
         'o_name'=>'tag',
         'o_container'=>'tags',
         'sync'=>'yes',
-        'table'=>'ciniki_conferences_tags',
+        'table'=>'ciniki_conferences_cfplog_tags',
         'fields'=>array(
             'conference_id'=>array('name'=>'Conference', 'ref'=>'ciniki.conferences.conference'),
             'tag_type'=>array('name'=>'Tag Type'),
