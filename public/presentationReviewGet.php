@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the presentation review is attached to.
+// tnid:         The ID of the tenant the presentation review is attached to.
 // review_id:          The ID of the presentation review to get the details for.
 //
 // Returns
@@ -20,7 +20,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'review_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Presentation Review'),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -30,19 +30,19 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.presentationReviewGet');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.presentationReviewGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -87,7 +87,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
             . "ciniki_conferences_presentation_reviews.vote, "
             . "ciniki_conferences_presentation_reviews.notes "
             . "FROM ciniki_conferences_presentation_reviews "
-            . "WHERE ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_conferences_presentation_reviews.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_conferences_presentation_reviews.id = '" . ciniki_core_dbQuote($ciniki, $args['review_id']) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
@@ -104,7 +104,7 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
         // Get the customer details
         //
         ciniki_core_loadMethod($ciniki, 'ciniki', 'customers', 'hooks', 'customerDetails');
-        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['business_id'], 
+        $rc = ciniki_customers_hooks_customerDetails($ciniki, $args['tnid'], 
             array('customer_id'=>$presentationreview['customer_id'], 'phones'=>'yes', 'emails'=>'yes', 'addresses'=>'no', 'subscriptions'=>'no'));
         if( $rc['stat'] != 'ok' ) {
             return $rc;
@@ -130,9 +130,9 @@ function ciniki_conferences_presentationReviewGet($ciniki) {
             . "FROM ciniki_conferences_presentations "
 //            . "LEFT JOIN ciniki_customers ON ("
 //                . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
-//                . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+//                . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
 //                . ") "
-            . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_conferences_presentations.id = '" . ciniki_core_dbQuote($ciniki, $presentationreview['presentation_id']) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');

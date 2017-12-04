@@ -16,7 +16,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'presentation_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Presentation'),
         'conference_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Conference'),
         'customer1_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Customer'),
@@ -46,10 +46,10 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.presentationUpdate');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.presentationUpdate');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -59,7 +59,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     //
     $strsql = "SELECT id, customer1_id, customer2_id, customer3_id, customer4_id, customer5_id, conference_id "
         . "FROM ciniki_conferences_presentations "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'item');
@@ -83,7 +83,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
         //
         $strsql = "SELECT id, title, permalink "
             . "FROM ciniki_conferences_presentations "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, (isset($args['conference_id'])?$args['conference_id']:$item['conference_id'])) . "' "
             . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
             . "AND id <> '" . ciniki_core_dbQuote($ciniki, $args['presentation_id']) . "' "
@@ -113,7 +113,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     // Update the Presentation in the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.presentation', $args['presentation_id'], $args, 0x04);
+    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.conferences.presentation', $args['presentation_id'], $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
         return $rc;
@@ -130,7 +130,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
             //
             $strsql = "SELECT id, conference_id, customer_id, status "
                 . "FROM ciniki_conferences_attendees "
-                . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $item['conference_id']) . "' "
                 . "AND customer_id = '" . ciniki_core_dbQuote($ciniki, $customer_id) . "' "
                 . "";
@@ -143,7 +143,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
                 // Add the attendee
                 //
                 ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-                $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
+                $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.conferences.attendee', array(
                     'conference_id'=>$item['conference_id'],
                     'customer_id'=>$customer_id,
                     'status'=>$args['registration' . $i],
@@ -159,7 +159,7 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
                     //
                     // Update the attendee
                     //
-                    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.conferences.attendee', $attendee['id'], array(
+                    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.conferences.attendee', $attendee['id'], array(
                         'status'=>$args['registration' . $i],
                         ), 0x04);
                     if( $rc['stat'] != 'ok' ) {
@@ -180,11 +180,11 @@ function ciniki_conferences_presentationUpdate(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'conferences');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'conferences');
 
     return array('stat'=>'ok');
 }

@@ -7,12 +7,12 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:        The ID of the business to get conferences for.
+// tnid:        The ID of the tenant to get conferences for.
 //
 // Returns
 // -------
 //
-function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
+function ciniki_conferences_hooks_uiSettings($ciniki, $tnid, $args) {
 
     //
     // Setup the default response
@@ -22,7 +22,7 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
     //
     // Get the settings
     //
-    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_conferences_settings', 'business_id', $business_id, 'ciniki.conferences', 'settings', '');
+    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_conferences_settings', 'tnid', $tnid, 'ciniki.conferences', 'settings', '');
     if( $rc['stat'] == 'ok' && isset($rc['settings']) ) {
         $rsp['settings'] = $rc['settings'];
     }
@@ -31,7 +31,7 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
     //
     // Check permissions for what menu items should be available
     //
-    if( isset($ciniki['business']['modules']['ciniki.conferences'])
+    if( isset($ciniki['tenant']['modules']['ciniki.conferences'])
         && (isset($args['permissions']['owners'])
             || isset($args['permissions']['employees'])
             || isset($args['permissions']['resellers'])
@@ -44,7 +44,7 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
         $strsql = "SELECT ciniki_conferences.id, "
             . "ciniki_conferences.name "
             . "FROM ciniki_conferences "
-            . "WHERE ciniki_conferences.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_conferences.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND status = 10 "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
@@ -80,7 +80,7 @@ function ciniki_conferences_hooks_uiSettings($ciniki, $business_id, $args) {
         }
     } 
     
-    if( isset($ciniki['business']['modules']['ciniki.conferences'])
+    if( isset($ciniki['tenant']['modules']['ciniki.conferences'])
         && (isset($args['permissions']['owners'])
             || isset($args['permissions']['resellers'])
             || ($ciniki['session']['user']['perms']&0x01) == 0x01

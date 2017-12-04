@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the conference room is attached to.
+// tnid:         The ID of the tenant the conference room is attached to.
 // room_id:          The ID of the conference room to get the details for.
 //
 // Returns
@@ -20,7 +20,7 @@ function ciniki_conferences_roomGet($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'room_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Conference Room'),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -30,19 +30,19 @@ function ciniki_conferences_roomGet($ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.roomGet');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.roomGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -73,7 +73,7 @@ function ciniki_conferences_roomGet($ciniki) {
             . "ciniki_conferences_rooms.name, "
             . "ciniki_conferences_rooms.sequence "
             . "FROM ciniki_conferences_rooms "
-            . "WHERE ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_conferences_rooms.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_conferences_rooms.id = '" . ciniki_core_dbQuote($ciniki, $args['room_id']) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');

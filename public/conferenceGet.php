@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the conference is attached to.
+// tnid:         The ID of the tenant the conference is attached to.
 // conference_id:          The ID of the conference to get the details for.
 //
 // Returns
@@ -20,7 +20,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'conference_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Conference'),
         'cfplogs'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'CFP Log Entries'),
         'presentations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Presentations'),
@@ -42,10 +42,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.conferenceGet');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.conferenceGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -55,10 +55,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
 
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -118,7 +118,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             . "ciniki_conferences.imap_password, "
             . "ciniki_conferences.imap_subject "
             . "FROM ciniki_conferences "
-            . "WHERE ciniki_conferences.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_conferences.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_conferences.id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
             . "";
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'conference');
@@ -143,7 +143,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "ciniki_conferences_cfplogs.sent_date, "
                 . "ciniki_conferences_cfplogs.email "
                 . "FROM ciniki_conferences_cfplogs "
-                . "WHERE ciniki_conferences_cfplogs.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_cfplogs.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_cfplogs.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
@@ -191,13 +191,13 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "LEFT JOIN ciniki_conferences_attendees ON ("
                     . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
                     . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
-                    . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_conferences_presentation_reviews ON ("
                     . "ciniki_conferences_presentations.id = ciniki_conferences_presentation_reviews.presentation_id "
-                    . "AND ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_presentation_reviews.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "";
             if( isset($args['presentation_status']) && $args['presentation_status'] > 0 ) {
@@ -264,10 +264,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
                     . "FROM ciniki_customers "
                     . "LEFT JOIN ciniki_customer_emails ON ("
                         . "ciniki_customers.id = ciniki_customer_emails.customer_id "
-                        . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                        . "AND ciniki_customer_emails.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                         . ") "
                     . "WHERE ciniki_customers.id IN (" . ciniki_core_dbQuoteIDs($ciniki, $customer_ids). ") "
-                    . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . "";
                 $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.conferences', array(
                     array('container'=>'emails', 'fname'=>'email', 'fields'=>array('display_name', 'email')),
@@ -295,9 +295,9 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "FROM ciniki_conferences_presentation_reviews "
                 . "LEFT JOIN ciniki_customers ON ("
                     . "ciniki_conferences_presentation_reviews.customer_id = ciniki_customers.id "
-                    . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentation_reviews.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentation_reviews.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "GROUP BY ciniki_conferences_presentation_reviews.customer_id, voted "
                 . "";
@@ -351,17 +351,17 @@ function ciniki_conferences_conferenceGet($ciniki) {
                         . "OR ciniki_conferences_attendees.customer_id = ciniki_conferences_presentations.customer5_id "
                         . ") "
                     . "AND ciniki_conferences_attendees.conference_id = ciniki_conferences_presentations.conference_id "
-                    . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_customers ON ("
                     . "ciniki_conferences_attendees.customer_id = ciniki_customers.id "
-                    . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_customer_emails ON ("
                     . "ciniki_customers.id = ciniki_customer_emails.customer_id "
-                    . "AND ciniki_customer_emails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_customer_emails.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_attendees.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "";
             if( isset($args['attendee_status']) && $args['attendee_status'] != '' ) {
@@ -416,22 +416,22 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "FROM ciniki_conferences_sessions "
                 . "INNER JOIN ciniki_conferences_rooms ON ("
                     . "ciniki_conferences_sessions.room_id = ciniki_conferences_rooms.id "
-                    . "AND ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_rooms.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_conferences_presentations ON ("
                     . "ciniki_conferences_sessions.id = ciniki_conferences_presentations.session_id "
-                    . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_conferences_attendees ON ("
                     . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
                     . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
-                    . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
                 . "LEFT JOIN ciniki_customers ON ("
                     . "ciniki_conferences_presentations.customer1_id = ciniki_customers.id "
-                    . "AND ciniki_customers.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_sessions.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_sessions.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "ORDER BY ciniki_conferences_sessions.session_start, "
                     . "ciniki_conferences_rooms.sequence, "
@@ -491,9 +491,9 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "LEFT JOIN ciniki_conferences_attendees ON ("
                     . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
                     . "AND ciniki_conferences_presentations.conference_id = ciniki_conferences_attendees.conference_id "
-                    . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "AND ciniki_conferences_presentations.session_id = 0 "
                 . "AND ciniki_conferences_presentations.status = 30 "
@@ -539,10 +539,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "FROM ciniki_conferences_sessions "
                 . "INNER JOIN ciniki_conferences_rooms ON ("
                     . "ciniki_conferences_sessions.room_id = ciniki_conferences_rooms.id "
-                    . "AND ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_rooms.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . "AND ciniki_conferences_rooms.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_sessions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_sessions.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_sessions.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "ORDER BY ciniki_conferences_sessions.session_start, ciniki_conferences_rooms.sequence, ciniki_conferences_rooms.name "
                 . "";
@@ -576,7 +576,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "ciniki_conferences_rooms.name, "
                 . "ciniki_conferences_rooms.sequence "
                 . "FROM ciniki_conferences_rooms "
-                . "WHERE ciniki_conferences_rooms.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_rooms.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_rooms.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "ORDER BY sequence, name "
                 . "";
@@ -601,7 +601,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
         if( isset($args['stats']) && $args['stats'] == 'yes' ) {
             $strsql = "SELECT status, COUNT(status) AS num_presentations "
                 . "FROM ciniki_conferences_presentations "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "GROUP BY status "
                 . "";
@@ -624,7 +624,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             //
             $strsql = "SELECT status, COUNT(status) AS num_attendees "
                 . "FROM ciniki_conferences_attendees "
-                . "WHERE ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_attendees.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "GROUP BY status "
                 . "";
@@ -649,10 +649,10 @@ function ciniki_conferences_conferenceGet($ciniki) {
                 . "FROM ciniki_conferences_presentations "
                 . "LEFT JOIN ciniki_conferences_attendees ON ("
                     . "ciniki_conferences_presentations.customer1_id = ciniki_conferences_attendees.customer_id "
-                    . "AND ciniki_conferences_attendees.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                    . "AND ciniki_conferences_attendees.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . "AND ciniki_conferences_attendees.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                     . ") "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "";
             if( isset($args['presentation_status']) && $args['presentation_status'] > 0 ) {
@@ -681,7 +681,7 @@ function ciniki_conferences_conferenceGet($ciniki) {
             //
             $strsql = "SELECT presentation_type, COUNT(*) AS num_presentations "
                 . "FROM ciniki_conferences_presentations "
-                . "WHERE ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "WHERE ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' "
                 . "GROUP BY presentation_type "
                 . "";

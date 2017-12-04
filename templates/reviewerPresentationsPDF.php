@@ -12,12 +12,12 @@
 // -------
 // <rsp stat='ok' id='34' />
 //
-function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $business_id, $reviewer_id, $conference_id) {
+function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $tnid, $reviewer_id, $conference_id) {
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -54,10 +54,10 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
         . "ciniki_conferences_presentations.permalink, "
         . "ciniki_conferences_presentations.description "
         . "FROM ciniki_conferences_presentation_reviews, ciniki_conferences_presentations "
-        . "WHERE ciniki_conferences_presentation_reviews.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_conferences_presentation_reviews.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ciniki_conferences_presentation_reviews.customer_id = '" . ciniki_core_dbQuote($ciniki, $reviewer_id) . "' "
         . "AND ciniki_conferences_presentation_reviews.presentation_id = ciniki_conferences_presentations.id "
-        . "AND ciniki_conferences_presentations.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "AND ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ciniki_conferences_presentations.conference_id = '" . ciniki_core_dbQuote($ciniki, $conference_id) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
@@ -83,17 +83,17 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     }
 
     //
-    // Load the business details
+    // Load the tenant details
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'businessDetails');
-    $rc = ciniki_businesses_businessDetails($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'tenantDetails');
+    $rc = ciniki_tenants_tenantDetails($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
     if( isset($rc['details']) && is_array($rc['details']) ) {    
-        $business_details = $rc['details'];
+        $tenant_details = $rc['details'];
     } else {
-        $business_details = array();
+        $tenant_details = array();
     }
 
     //
@@ -102,7 +102,7 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     $strsql = "SELECT id, name "
         . "FROM ciniki_conferences "
         . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $conference_id) . "' "
-        . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.conferences', 'conference');
     if( $rc['stat'] != 'ok' ) {
@@ -129,7 +129,7 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
         public $header_addr = array();
         public $header_details = array();
         public $header_height = 25;        // The height of the image and address
-        public $business_details = array();
+        public $tenant_details = array();
         public $courses_settings = array();
         public $conference_name = '';
 
@@ -152,14 +152,14 @@ function ciniki_conferences_templates_reviewerPresentationsPDF(&$ciniki, $busine
     //
     $pdf = new MYPDF('P', PDF_UNIT, 'LETTER', true, 'UTF-8', false);
 
-    $pdf->business_details = $business_details;
+    $pdf->tenant_details = $tenant_details;
     $pdf->conference_name = $conference['name'];
 
     //
     // Setup the PDF basics
     //
     $pdf->SetCreator('Ciniki');
-    $pdf->SetAuthor($business_details['name']);
+    $pdf->SetAuthor($tenant_details['name']);
     $pdf->SetTitle($conference['name']);
     $pdf->SetSubject('');
     $pdf->SetKeywords('');

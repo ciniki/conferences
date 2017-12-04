@@ -1,5 +1,5 @@
 //
-// This app will handle the listing, additions and deletions of conferences.  These are associated business.
+// This app will handle the listing, additions and deletions of conferences.  These are associated tenant.
 //
 function ciniki_conferences_main() {
     //
@@ -25,7 +25,7 @@ function ciniki_conferences_main() {
     };
     this.menu.open = function(cb) {
         this.data = {};
-        M.api.getJSONCb('ciniki.conferences.conferenceList', {'business_id':M.curBusinessID}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.conferenceList', {'tnid':M.curTenantID}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -351,7 +351,7 @@ function ciniki_conferences_main() {
     };
     this.conference.liveSearchCb = function(s, i, value) {
         if( s == 'presentationsearch' && value != '' ) {
-            M.api.getJSONBgCb('ciniki.conferences.presentationSearch', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'start_needle':value, 'limit':'15'}, 
+            M.api.getJSONBgCb('ciniki.conferences.presentationSearch', {'tnid':M.curTenantID, 'conference_id':this.conference_id, 'start_needle':value, 'limit':'15'}, 
                 function(rsp) { 
                     M.ciniki_conferences_main.conference.liveSearchShow('presentationsearch', null, M.gE(M.ciniki_conferences_main.conference.panelUID + '_' + s), rsp.presentations); 
                 });
@@ -378,7 +378,7 @@ function ciniki_conferences_main() {
                 this.sections._registrationtabs.selected = sstab;
             }
         }
-        var args = {'business_id':M.curBusinessID, 'conference_id':this.conference_id};
+        var args = {'tnid':M.curTenantID, 'conference_id':this.conference_id};
         if( this.sections._tabs.selected == 'sessions' ) {
             switch (this.sections._sessiontabs.selected) {
                 case 'presentations': args['sessionpresentations'] = 'yes'; break;
@@ -428,13 +428,13 @@ function ciniki_conferences_main() {
         });
     };
     this.conference.attendeeExport = function(t) {
-        M.api.openFile('ciniki.conferences.attendeeExport', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'type':t, 'output':'excel'});
+        M.api.openFile('ciniki.conferences.attendeeExport', {'tnid':M.curTenantID, 'conference_id':this.conference_id, 'type':t, 'output':'excel'});
     };
     this.conference.scheduleDownload = function() {
-        M.api.openFile('ciniki.conferences.conferenceScheduleDownload', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'output':'word'});
+        M.api.openFile('ciniki.conferences.conferenceScheduleDownload', {'tnid':M.curTenantID, 'conference_id':this.conference_id, 'output':'word'});
     };
     this.conference.biosDownload = function() {
-        M.api.openFile('ciniki.conferences.conferenceBiosDownload', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'output':'word'});
+        M.api.openFile('ciniki.conferences.conferenceBiosDownload', {'tnid':M.curTenantID, 'conference_id':this.conference_id, 'output':'word'});
     };
     this.conference.addButton('edit', 'Edit', 'M.ciniki_conferences_main.edit.edit(\'M.ciniki_conferences_main.conference.open();\',M.ciniki_conferences_main.conference.conference_id);');
     this.conference.addClose('Back');
@@ -455,7 +455,7 @@ function ciniki_conferences_main() {
             'end_date':{'label':'End Date', 'type':'date'},
             }}, 
         '_imap':{'label':'Email Submissions', 'aside':'yes',
-            'active':function() {return (M.curBusiness.modules['ciniki.conferences'].flags&0x02)>0?'yes':'no';},
+            'active':function() {return (M.curTenant.modules['ciniki.conferences'].flags&0x02)>0?'yes':'no';},
             'fields':{
             'imap_mailbox':{'label':'Mailbox', 'type':'text'},
             'imap_username':{'label':'Username', 'type':'text'},
@@ -475,7 +475,7 @@ function ciniki_conferences_main() {
         };  
     this.edit.fieldValue = function(s, i, d) { return this.data[i]; }
     this.edit.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'tnid':M.curTenantID, 
             'conference_id':this.conference_id, 'field':i}};
     }
     this.edit.addDropImage = function(iid) {
@@ -490,7 +490,7 @@ function ciniki_conferences_main() {
         this.reset();
         if( sid != null ) { this.conference_id = sid; }
         this.sections._buttons.buttons.delete.visible = (this.conference_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.conferenceGet', {'business_id':M.curBusinessID, 'conference_id':this.conference_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.conferenceGet', {'tnid':M.curTenantID, 'conference_id':this.conference_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -505,7 +505,7 @@ function ciniki_conferences_main() {
         if( this.conference_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.conferenceUpdate', {'business_id':M.curBusinessID, 'conference_id':this.conference_id}, c,
+                M.api.postJSONCb('ciniki.conferences.conferenceUpdate', {'tnid':M.curTenantID, 'conference_id':this.conference_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -518,7 +518,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.conferenceAdd', {'business_id':M.curBusinessID}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.conferenceAdd', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -536,7 +536,7 @@ function ciniki_conferences_main() {
     this.edit.remove = function() {
         if( confirm("Are you sure you want to remove '" + this.data.name + "'?") ) {
             M.api.getJSONCb('ciniki.conferences.conferenceDelete', 
-                {'business_id':M.curBusinessID, 'conference_id':this.conference_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'conference_id':this.conference_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -569,7 +569,7 @@ function ciniki_conferences_main() {
         };  
     this.session.fieldValue = function(s, i, d) { return this.data[i]; }
     this.session.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'tnid':M.curTenantID, 
             'conference_id':this.conference_id, 'field':i}};
     }
     this.session.liveAppointmentDayEvents = function(i, day, cb) {
@@ -580,7 +580,7 @@ function ciniki_conferences_main() {
         if( rid != null ) { this.session_id = rid; }
         if( cid != null ) { this.conference_id = cid; }
         this.sections._buttons.buttons.delete.visible = (this.session_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.sessionGet', {'business_id':M.curBusinessID, 'session_id':this.session_id, 'conference_id':this.conference_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.sessionGet', {'tnid':M.curTenantID, 'session_id':this.session_id, 'conference_id':this.conference_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -597,7 +597,7 @@ function ciniki_conferences_main() {
         if( this.session_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.sessionUpdate', {'business_id':M.curBusinessID, 'session_id':this.session_id}, c,
+                M.api.postJSONCb('ciniki.conferences.sessionUpdate', {'tnid':M.curTenantID, 'session_id':this.session_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -610,7 +610,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.sessionAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.sessionAdd', {'tnid':M.curTenantID, 'conference_id':this.conference_id}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -621,7 +621,7 @@ function ciniki_conferences_main() {
     };
     this.session.remove = function() {
         if( confirm("Are you sure you want to remove the session '" + this.data.name + "'?") ) {
-            M.api.getJSONCb('ciniki.conferences.sessionDelete', {'business_id':M.curBusinessID, 'session_id':this.session_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.sessionDelete', {'tnid':M.curTenantID, 'session_id':this.session_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -652,7 +652,7 @@ function ciniki_conferences_main() {
         };  
     this.room.fieldValue = function(s, i, d) { return this.data[i]; }
     this.room.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'business_id':M.curBusinessID, 
+        return {'method':'ciniki.conferences.conferenceHistory', 'args':{'tnid':M.curTenantID, 
             'conference_id':this.conference_id, 'field':i}};
     }
     this.room.open = function(cb, rid, cid) {
@@ -660,7 +660,7 @@ function ciniki_conferences_main() {
         if( rid != null ) { this.room_id = rid; }
         if( cid != null ) { this.conference_id = cid; }
         this.sections._buttons.buttons.delete.visible = (this.room_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.roomGet', {'business_id':M.curBusinessID, 'room_id':this.room_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.roomGet', {'tnid':M.curTenantID, 'room_id':this.room_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -675,7 +675,7 @@ function ciniki_conferences_main() {
         if( this.room_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.roomUpdate', {'business_id':M.curBusinessID, 'room_id':this.room_id}, c,
+                M.api.postJSONCb('ciniki.conferences.roomUpdate', {'tnid':M.curTenantID, 'room_id':this.room_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -688,7 +688,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.roomAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.roomAdd', {'tnid':M.curTenantID, 'conference_id':this.conference_id}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -699,7 +699,7 @@ function ciniki_conferences_main() {
     };
     this.room.remove = function() {
         if( confirm("Are you sure you want to remove the room '" + this.data.name + "'?") ) {
-            M.api.getJSONCb('ciniki.conferences.roomDelete', {'business_id':M.curBusinessID, 'room_id':this.room_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.roomDelete', {'tnid':M.curTenantID, 'room_id':this.room_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -735,7 +735,7 @@ function ciniki_conferences_main() {
         };  
     this.attendee.fieldValue = function(s, i, d) { return this.data[i]; }
     this.attendee.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.attendeeHistory', 'args':{'business_id':M.curBusinessID, 'attendee_id':this.attendee_id, 'field':i}};
+        return {'method':'ciniki.conferences.attendeeHistory', 'args':{'tnid':M.curTenantID, 'attendee_id':this.attendee_id, 'field':i}};
     }
     this.attendee.sectionData = function(s) { return this.data[s]; }
     this.attendee.cellValue = function(s, i, j, d) {
@@ -753,7 +753,7 @@ function ciniki_conferences_main() {
             this.cb = cb;
             M.startApp('ciniki.customers.edit',null,cb,'mc',{'next':'M.ciniki_conferences_main.attendee.add','customer_id':0});
         } else {
-            M.api.getJSONCb('ciniki.conferences.attendeeGet', {'business_id':M.curBusinessID, 'attendee_id':this.attendee_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.attendeeGet', {'tnid':M.curTenantID, 'attendee_id':this.attendee_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -767,7 +767,7 @@ function ciniki_conferences_main() {
         }
     }
     this.attendee.add = function(cid) {
-        M.api.getJSONCb('ciniki.conferences.attendeeGet', {'business_id':M.curBusinessID, 'attendee_id':0, 'customer_id':cid}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.attendeeGet', {'tnid':M.curTenantID, 'attendee_id':0, 'customer_id':cid}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -783,7 +783,7 @@ function ciniki_conferences_main() {
         if( this.attendee_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.attendeeUpdate', {'business_id':M.curBusinessID, 'attendee_id':this.attendee_id}, c, function(rsp) {
+                M.api.postJSONCb('ciniki.conferences.attendeeUpdate', {'tnid':M.curTenantID, 'attendee_id':this.attendee_id}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -795,7 +795,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.attendeeAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, 'customer_id':this.customer_id}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.attendeeAdd', {'tnid':M.curTenantID, 'conference_id':this.conference_id, 'customer_id':this.customer_id}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -919,7 +919,7 @@ function ciniki_conferences_main() {
     };
     this.presentation.open = function(cb, sid) {
         if( sid != null ) { this.presentation_id = sid; }
-        M.api.getJSONCb('ciniki.conferences.presentationGet', {'business_id':M.curBusinessID, 'presentation_id':this.presentation_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.presentationGet', {'tnid':M.curTenantID, 'presentation_id':this.presentation_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -932,7 +932,7 @@ function ciniki_conferences_main() {
     };
     this.presentation.addReview = function(cid) {
         if( cid != null && this.data.customer_id != cid ) {
-            M.api.getJSONCb('ciniki.conferences.presentationReviewAdd', {'business_id':M.curBusinessID,
+            M.api.getJSONCb('ciniki.conferences.presentationReviewAdd', {'tnid':M.curTenantID,
                 'presentation_id':this.presentation_id, 'customer_id':cid, 'conference_id':this.data.conference_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -943,7 +943,7 @@ function ciniki_conferences_main() {
         }
     };
     this.presentation.accept = function(pid) {
-        M.api.getJSONCb('ciniki.conferences.presentationUpdate', {'business_id':M.curBusinessID, 'presentation_id':pid, 'status':30}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.presentationUpdate', {'tnid':M.curTenantID, 'presentation_id':pid, 'status':30}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -952,7 +952,7 @@ function ciniki_conferences_main() {
         });
     };
     this.presentation.reject = function(pid) {
-        M.api.getJSONCb('ciniki.conferences.presentationUpdate', {'business_id':M.curBusinessID, 'presentation_id':pid, 'status':50}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.presentationUpdate', {'tnid':M.curTenantID, 'presentation_id':pid, 'status':50}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -995,13 +995,13 @@ function ciniki_conferences_main() {
         };  
     this.presentationedit.fieldValue = function(s, i, d) { return this.data[i]; }
     this.presentationedit.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.presentationHistory', 'args':{'business_id':M.curBusinessID, 'presentation_id':this.presentation_id, 'field':i}};
+        return {'method':'ciniki.conferences.presentationHistory', 'args':{'tnid':M.curTenantID, 'presentation_id':this.presentation_id, 'field':i}};
     }
     this.presentationedit.edit = function(cb, pid) {
         this.reset();
         if( pid != null ) { this.presentation_id = pid; }
         this.sections._buttons.buttons.delete.visible = (this.presentation_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.presentationGet', {'business_id':M.curBusinessID, 'presentation_id':this.presentation_id, 'conference_id':this.conference_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.presentationGet', {'tnid':M.curTenantID, 'presentation_id':this.presentation_id, 'conference_id':this.conference_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -1039,7 +1039,7 @@ function ciniki_conferences_main() {
         if( this.presentation_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.presentationUpdate', {'business_id':M.curBusinessID, 'presentation_id':this.presentation_id}, c,
+                M.api.postJSONCb('ciniki.conferences.presentationUpdate', {'tnid':M.curTenantID, 'presentation_id':this.presentation_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -1052,7 +1052,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.presentationAdd', {'business_id':M.curBusinessID}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.presentationAdd', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1070,7 +1070,7 @@ function ciniki_conferences_main() {
     this.presentationedit.remove = function() {
         if( confirm("Are you sure you want to remove '" + this.data.name + "'?") ) {
             M.api.getJSONCb('ciniki.conferences.presentation.remove', 
-                {'business_id':M.curBusinessID, 'presentation_id':this.presentation_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'presentation_id':this.presentation_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -1145,7 +1145,7 @@ function ciniki_conferences_main() {
     this.reviewer.open = function(cb, rid, cid) {
         if( rid != null ) { this.reviewer_id = rid; }
         if( cid != null ) { this.conference_id = cid; }
-        M.api.getJSONCb('ciniki.conferences.reviewerGet', {'business_id':M.curBusinessID, 
+        M.api.getJSONCb('ciniki.conferences.reviewerGet', {'tnid':M.curTenantID, 
             'reviewer_id':this.reviewer_id, 'conference_id':this.conference_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -1158,7 +1158,7 @@ function ciniki_conferences_main() {
             });
     };
     this.reviewer.openPDF = function(cb) {
-        M.api.openFile('ciniki.conferences.reviewerPDF', {'business_id':M.curBusinessID, 'reviewer_id':this.reviewer_id, 'conference_id':this.conference_id});
+        M.api.openFile('ciniki.conferences.reviewerPDF', {'tnid':M.curTenantID, 'reviewer_id':this.reviewer_id, 'conference_id':this.conference_id});
     };
     this.reviewer.addClose('Back');
 
@@ -1188,13 +1188,13 @@ function ciniki_conferences_main() {
     this.revieweremail.open = function(cb, rid, cid) {
         this.reviewer_id = rid;
         this.conference_id = cid;
-        if( M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'] != null ) {
-            this.data.subject = M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'];
+        if( M.curTenant.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'] != null ) {
+            this.data.subject = M.curTenant.modules['ciniki.conferences'].settings['reviewers-message-reviews-subject'];
         } else {
             this.data.subject = 'Conference submissions for your review';
         }
-        if( M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'] != null ) {
-            this.data.textmsg = M.curBusiness.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'];
+        if( M.curTenant.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'] != null ) {
+            this.data.textmsg = M.curTenant.modules['ciniki.conferences'].settings['reviewers-message-reviews-content'];
         } else {
             this.data.textmsg = 'Please review the following submissions and let us know which you thing are approriate.';
         }
@@ -1204,7 +1204,7 @@ function ciniki_conferences_main() {
     this.revieweremail.sendEmail = function() {
         var subject = this.formFieldValue(this.sections._subject.fields.subject, 'subject');
         var textmsg = this.formFieldValue(this.sections._textmsg.fields.textmsg, 'textmsg');
-        M.api.getJSONCb('ciniki.conferences.reviewerPDF', {'business_id':M.curBusinessID, 
+        M.api.getJSONCb('ciniki.conferences.reviewerPDF', {'tnid':M.curTenantID, 
             'reviewer_id':this.reviewer_id, 'conference_id':this.conference_id, 'subject':subject, 'content':textmsg, 'output':'pdf', 'email':'yes'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -1243,7 +1243,7 @@ function ciniki_conferences_main() {
         };  
     this.review.fieldValue = function(s, i, d) { return this.data[i]; }
     this.review.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.presentationReviewHistory', 'args':{'business_id':M.curBusinessID, 'review_id':this.review_id, 'field':i}};
+        return {'method':'ciniki.conferences.presentationReviewHistory', 'args':{'tnid':M.curTenantID, 'review_id':this.review_id, 'field':i}};
     }
     this.review.sectionData = function(s) { return this.data[s]; }
     this.review.cellValue = function(s, i, j, d) {
@@ -1263,7 +1263,7 @@ function ciniki_conferences_main() {
         this.reset();
         if( rid != null ) { this.review_id = rid; }
         this.sections._buttons.buttons.delete.visible = (this.review_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.presentationReviewGet', {'business_id':M.curBusinessID, 'review_id':this.review_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.presentationReviewGet', {'tnid':M.curTenantID, 'review_id':this.review_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -1278,7 +1278,7 @@ function ciniki_conferences_main() {
         if( this.review_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.presentationReviewUpdate', {'business_id':M.curBusinessID, 'review_id':this.review_id}, c,
+                M.api.postJSONCb('ciniki.conferences.presentationReviewUpdate', {'tnid':M.curTenantID, 'review_id':this.review_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -1291,7 +1291,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.presentationReviewAdd', {'business_id':M.curBusinessID}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.presentationReviewAdd', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1302,7 +1302,7 @@ function ciniki_conferences_main() {
     };
     this.review.remove = function() {
         if( confirm("Are you sure you want to remove this review?") ) {
-            M.api.getJSONCb('ciniki.conferences.presentationReviewDelete', {'business_id':M.curBusinessID, 'review_id':this.review_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.presentationReviewDelete', {'tnid':M.curTenantID, 'review_id':this.review_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1342,14 +1342,14 @@ function ciniki_conferences_main() {
         };  
     this.cfplog.fieldValue = function(s, i, d) { return this.data[i]; }
     this.cfplog.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.CFPLogHistory', 'args':{'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, 'field':i}};
+        return {'method':'ciniki.conferences.CFPLogHistory', 'args':{'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id, 'field':i}};
     }
     this.cfplog.edit = function(cb, lid, cid) {
         if( lid != null ) { this.cfplog_id = lid; }
         if( cid != null ) { this.conference_id = cid; }
         this.reset();
         this.sections._buttons.buttons.delete.visible = (this.cfplog_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.CFPLogGet', {'business_id':M.curBusinessID, 
+        M.api.getJSONCb('ciniki.conferences.CFPLogGet', {'tnid':M.curTenantID, 
             'cfplog_id':this.cfplog_id,
             'categories':'yes',
             }, function(rsp) {
@@ -1373,7 +1373,7 @@ function ciniki_conferences_main() {
         if( this.cfplog_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
+                M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -1385,7 +1385,7 @@ function ciniki_conferences_main() {
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.CFPLogAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, }, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.CFPLogAdd', {'tnid':M.curTenantID, 'conference_id':this.conference_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -1396,7 +1396,7 @@ function ciniki_conferences_main() {
     };
     this.cfplog.remove = function() {
         if( confirm("Are you sure you want to remove this CFP?") ) {
-            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;

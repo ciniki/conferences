@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will add a new presentation for the business.
+// This method will add a new presentation for the tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:        The ID of the business to add the Presentation to.
+// tnid:        The ID of the tenant to add the Presentation to.
 //
 // Returns
 // -------
@@ -20,7 +20,7 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'conference_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Conference'),
         'customer_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Customer'),
         'presentation_type'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Type'),
@@ -39,10 +39,10 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     $args = $rc['args'];
 
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.presentationAdd');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.presentationAdd');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -57,7 +57,7 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     //
     $strsql = "SELECT id "
         . "FROM ciniki_conferences_presentations "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' " 
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' " 
         . "AND conference_id = '" . ciniki_core_dbQuote($ciniki, $args['conference_id']) . "' " 
         . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
         . "";
@@ -89,7 +89,7 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     // Add the presentation to the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-    $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.presentation', $args, 0x04);
+    $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.conferences.presentation', $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.conferences');
         return $rc;
@@ -100,7 +100,7 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     // Check if registration set
     // 
     if( isset($args['registration']) && $args['registration'] > 0 ) {
-        $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.conferences.attendee', array(
+        $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.conferences.attendee', array(
             'conference_id'=>$args['conference_id'],
             'customer_id'=>$args['customer_id'],
             'status'=>$args['registration'],
@@ -121,11 +121,11 @@ function ciniki_conferences_presentationAdd(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'conferences');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'conferences');
 
     return array('stat'=>'ok', 'id'=>$presentation_id);
 }

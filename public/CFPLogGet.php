@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the cfp log is attached to.
+// tnid:         The ID of the tenant the cfp log is attached to.
 // cfplog_id:          The ID of the cfp log to get the details for.
 //
 // Returns
@@ -20,7 +20,7 @@ function ciniki_conferences_CFPLogGet($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'cfplog_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'CFP Log'),
         'categories'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Categories'),
         ));
@@ -31,19 +31,19 @@ function ciniki_conferences_CFPLogGet($ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.CFPLogGet');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.CFPLogGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -82,7 +82,7 @@ function ciniki_conferences_CFPLogGet($ciniki) {
             . "DATE_FORMAT(ciniki_conferences_cfplogs.sent_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS sent_date, "
             . "ciniki_conferences_cfplogs.notes "
             . "FROM ciniki_conferences_cfplogs "
-            . "WHERE ciniki_conferences_cfplogs.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_conferences_cfplogs.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_conferences_cfplogs.id = '" . ciniki_core_dbQuote($ciniki, $args['cfplog_id']) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
@@ -101,7 +101,7 @@ function ciniki_conferences_CFPLogGet($ciniki) {
         $strsql = "SELECT tag_type, tag_name AS lists "
             . "FROM ciniki_conferences_cfplog_tags "
             . "WHERE cfplog_id = '" . ciniki_core_dbQuote($ciniki, $args['cfplog_id']) . "' "
-            . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "ORDER BY tag_type, tag_name "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
@@ -128,7 +128,7 @@ function ciniki_conferences_CFPLogGet($ciniki) {
     //
     if( isset($args['categories']) && $args['categories'] == 'yes' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsList');
-        $rc = ciniki_core_tagsList($ciniki, 'ciniki.conferences', $args['business_id'], 'ciniki_conferences_cfplog_tags', 10);
+        $rc = ciniki_core_tagsList($ciniki, 'ciniki.conferences', $args['tnid'], 'ciniki_conferences_cfplog_tags', 10);
         if( $rc['stat'] != 'ok' ) {
             return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.conferences.7', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
         }

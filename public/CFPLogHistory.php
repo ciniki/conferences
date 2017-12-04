@@ -10,7 +10,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to get the details for.
+// tnid:         The ID of the tenant to get the details for.
 // cfplog_id:          The ID of the cfp log to get the history for.
 // field:                   The field to get the history for.
 //
@@ -27,7 +27,7 @@ function ciniki_conferences_CFPLogHistory($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'cfplog_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'CFP Log'),
         'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'),
         ));
@@ -37,15 +37,15 @@ function ciniki_conferences_CFPLogHistory($ciniki) {
     $args = $rc['args'];
 
     //
-    // Check access to business_id as owner, or sys admin
+    // Check access to tnid as owner, or sys admin
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'conferences', 'private', 'checkAccess');
-    $rc = ciniki_conferences_checkAccess($ciniki, $args['business_id'], 'ciniki.conferences.CFPLogHistory');
+    $rc = ciniki_conferences_checkAccess($ciniki, $args['tnid'], 'ciniki.conferences.CFPLogHistory');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
-    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.conferences', 'ciniki_conferences_history', $args['business_id'], 'ciniki_conferences_cfplogs', $args['cfplog_id'], $args['field']);
+    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.conferences', 'ciniki_conferences_history', $args['tnid'], 'ciniki_conferences_cfplogs', $args['cfplog_id'], $args['field']);
 }
 ?>

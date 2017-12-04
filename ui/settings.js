@@ -23,7 +23,7 @@ function ciniki_conferences_settings() {
                 }},
         };
         this.menu.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.conferences.settingsHistory', 'args':{'business_id':M.curBusinessID, 'setting':i}};
+            return {'method':'ciniki.conferences.settingsHistory', 'args':{'tnid':M.curTenantID, 'setting':i}};
         }
         this.menu.fieldValue = function(s, i, d) {
             return this.data[i];
@@ -49,7 +49,7 @@ function ciniki_conferences_settings() {
                 }},
         };
         this.reviewers.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.conferences.settingsHistory', 'args':{'business_id':M.curBusinessID, 'setting':i}};
+            return {'method':'ciniki.conferences.settingsHistory', 'args':{'tnid':M.curTenantID, 'setting':i}};
         }
         this.reviewers.fieldValue = function(s, i, d) {
             return this.data[i];
@@ -75,7 +75,7 @@ function ciniki_conferences_settings() {
                 }},
         };
         this.submissions.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.conferences.settingsHistory', 'args':{'business_id':M.curBusinessID, 'setting':i}};
+            return {'method':'ciniki.conferences.settingsHistory', 'args':{'tnid':M.curTenantID, 'setting':i}};
         }
         this.submissions.fieldValue = function(s, i, d) {
             return this.data[i];
@@ -117,7 +117,7 @@ function ciniki_conferences_settings() {
     // show the paypal settings
     //
     this.settingsEdit = function(panel) {
-        M.api.getJSONCb('ciniki.conferences.settingsGet', {'business_id':M.curBusinessID}, function(rsp) {
+        M.api.getJSONCb('ciniki.conferences.settingsGet', {'tnid':M.curTenantID}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -135,7 +135,7 @@ function ciniki_conferences_settings() {
     this.settingsSave = function(panel) {
         var c = this[panel].serializeForm('no');
         if( c != '' ) {
-            M.api.postJSONCb('ciniki.conferences.settingsUpdate', {'business_id':M.curBusinessID}, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.settingsUpdate', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;

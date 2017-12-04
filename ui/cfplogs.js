@@ -26,14 +26,14 @@
         };  
     this.cfplog.fieldValue = function(s, i, d) { return this.data[i]; }
     this.cfplog.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.conferences.CFPLogHistory', 'args':{'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, 'field':i}};
+        return {'method':'ciniki.conferences.CFPLogHistory', 'args':{'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id, 'field':i}};
     }
     this.cfplog.edit = function(cb, cid, lid) {
         if( cid != null ) { this.conference_id = cid; }
         if( lid != null ) { this.cfplog_id = lid; }
         this.reset();
         this.sections._buttons.buttons.delete.visible = (this.cfplog_id>0?'yes':'no');
-        M.api.getJSONCb('ciniki.conferences.CFPLogGet', {'business_id':M.curBusinessID, 
+        M.api.getJSONCb('ciniki.conferences.CFPLogGet', {'tnid':M.curTenantID, 
             'cfplog_id':this.cfplog_id,
             'categories':'yes',
             }, function(rsp) {
@@ -57,7 +57,7 @@
         if( this.cfplog_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
+                M.api.postJSONCb('ciniki.conferences.CFPLogUpdate', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -69,7 +69,7 @@
             }
         } else {
             var c = this.serializeForm('yes');
-            M.api.postJSONCb('ciniki.conferences.CFPLogAdd', {'business_id':M.curBusinessID, 'conference_id':this.conference_id, }, c, function(rsp) {
+            M.api.postJSONCb('ciniki.conferences.CFPLogAdd', {'tnid':M.curTenantID, 'conference_id':this.conference_id, }, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -80,7 +80,7 @@
     };
     this.cfplog.remove = function() {
         if( confirm("Are you sure you want to remove this CFP?") ) {
-            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'business_id':M.curBusinessID, 'cfplog_id':this.cfplog_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
