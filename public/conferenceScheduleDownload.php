@@ -308,7 +308,6 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                 if( !isset($room['presentations']) || $room['presentation_id'] == 0 ) {
                     continue;
                 }
-                error_log($session_number . ". " . $room['session_name']);
                 $section->addTitle(htmlspecialchars($session_number . ". " . $room['session_name']), 1);
                 if( isset($room['presentations']) && $room['presentation_id'] != 0 ) {
                     foreach($room['presentations'] as $pid => $presentation) {
