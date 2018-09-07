@@ -214,7 +214,6 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
     $table->addRow();
     $cell = $table->addCell(9600);
     $cell->addText($conference['name'], array('size'=>'16'), array('align'=>'center'));
-
    
     //print "<pre>" . print_r($timeslots, true) . "</pre>";
     //exit;
@@ -287,11 +286,11 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
         }
         $cell = $table->addCell(2500, $style_cell);
         foreach($nonsession_info as $line) {
-            $cell->addText($line, $style_cell_font);
+            $cell->addText(htmlspecialchars($line), $style_cell_font);
         }
         $cell = $table->addCell(5500, $style_cell);
         foreach($session_info as $line) {
-            $cell->addText($line, $style_cell_font);
+            $cell->addText(htmlspecialchars($line), $style_cell_font);
         }
     }
 
@@ -309,7 +308,8 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                 if( !isset($room['presentations']) || $room['presentation_id'] == 0 ) {
                     continue;
                 }
-                $section->addTitle($session_number . ". " . $room['session_name'], 1);
+                error_log($session_number . ". " . $room['session_name']);
+                $section->addTitle(htmlspecialchars($session_number . ". " . $room['session_name']), 1);
                 if( isset($room['presentations']) && $room['presentation_id'] != 0 ) {
                     foreach($room['presentations'] as $pid => $presentation) {
                         //
@@ -321,7 +321,7 @@ function ciniki_conferences_conferenceScheduleDownload($ciniki) {
                                 $presentation['display_name'] .= ($presentation['display_name'] != '' ? ', ' : '') . $customer['display_name'];
                             }
                         }
-                        $section->addTitle($presentation['display_name'], 2);
+                        $section->addTitle(htmlspecialchars($presentation['display_name']), 2);
                         $section->addTitle(htmlspecialchars($presentation['presentation_title']), 3);
                         $lines = explode("\n", $presentation['presentation_description']);
                         foreach($lines as $line) {

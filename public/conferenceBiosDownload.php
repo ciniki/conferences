@@ -236,7 +236,7 @@ function ciniki_conferences_conferenceBiosDownload($ciniki) {
                 }
                 if( isset($room['presentations']) && $room['presentation_id'] != 0 ) {
                     foreach($room['presentations'] as $pid => $presentation) {
-                        $section->addTitle($presentation['display_name'], 1);
+                        $section->addTitle(htmlspecialchars($presentation['display_name']), 1);
                         $lines = explode("\n", $presentation['full_bio']);
                         foreach($lines as $line) {
                             $section->addText(htmlspecialchars($line), array());
