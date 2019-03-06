@@ -990,7 +990,7 @@ function ciniki_conferences_main() {
             }},
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_conferences_main.presentationedit.save();'},
-            'delete':{'label':'Delete', 'visible':'no', 'fn':'M.ciniki_conferences_main.presentation.remove();'},
+            'delete':{'label':'Delete', 'visible':'no', 'fn':'M.ciniki_conferences_main.presentationedit.remove();'},
             }},
         };  
     this.presentationedit.fieldValue = function(s, i, d) { return this.data[i]; }
@@ -1069,7 +1069,7 @@ function ciniki_conferences_main() {
     };
     this.presentationedit.remove = function() {
         if( confirm("Are you sure you want to remove '" + this.data.name + "'?") ) {
-            M.api.getJSONCb('ciniki.conferences.presentation.remove', 
+            M.api.getJSONCb('ciniki.conferences.presentationDelete', 
                 {'tnid':M.curTenantID, 'presentation_id':this.presentation_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
