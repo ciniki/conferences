@@ -79,15 +79,15 @@
         }
     };
     this.cfplog.remove = function() {
-        if( confirm("Are you sure you want to remove this CFP?") ) {
-            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove this CFP?",null,function() {
+            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':M..cfplog.cfplog_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.edit.close();
             });
-        }
+        });
     };
     this.cfplog.addButton('save', 'Save', 'M.ciniki_conferences_main.cfplog.save();');
     this.cfplog.addClose('Cancel');

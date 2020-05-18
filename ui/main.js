@@ -534,16 +534,16 @@ function ciniki_conferences_main() {
         }
     };
     this.edit.remove = function() {
-        if( confirm("Are you sure you want to remove '" + this.data.name + "'?") ) {
+        M.confirm("Are you sure you want to remove '" + this.data.name + "'?",null,function() {
             M.api.getJSONCb('ciniki.conferences.conferenceDelete', 
-                {'tnid':M.curTenantID, 'conference_id':this.conference_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'conference_id':M.ciniki_conferences_main.edit.conference_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
                     }
                     M.ciniki_conferences_main.edit.close();
                 });
-        }
+        });
     };
     this.edit.addButton('save', 'Save', 'M.ciniki_conferences_main.edit.save();');
     this.edit.addClose('Cancel');
@@ -620,15 +620,15 @@ function ciniki_conferences_main() {
         }
     };
     this.session.remove = function() {
-        if( confirm("Are you sure you want to remove the session '" + this.data.name + "'?") ) {
-            M.api.getJSONCb('ciniki.conferences.sessionDelete', {'tnid':M.curTenantID, 'session_id':this.session_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove the session '" + this.data.name + "'?",null,function() {
+            M.api.getJSONCb('ciniki.conferences.sessionDelete', {'tnid':M.curTenantID, 'session_id':M.ciniki_conferences_main.session.session_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.session.close();
             });
-        }
+        });
     };
     this.session.addButton('save', 'Save', 'M.ciniki_conferences_main.session.save();');
     this.session.addClose('Cancel');
@@ -698,15 +698,15 @@ function ciniki_conferences_main() {
         }
     };
     this.room.remove = function() {
-        if( confirm("Are you sure you want to remove the room '" + this.data.name + "'?") ) {
-            M.api.getJSONCb('ciniki.conferences.roomDelete', {'tnid':M.curTenantID, 'room_id':this.room_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove the room '" + this.data.name + "'?",null,function() {
+            M.api.getJSONCb('ciniki.conferences.roomDelete', {'tnid':M.curTenantID, 'room_id':M.ciniki_conferences_main.room.room_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.room.close();
             });
-        }
+        });
     };
     this.room.addButton('save', 'Save', 'M.ciniki_conferences_main.room.save();');
     this.room.addClose('Cancel');
@@ -1068,16 +1068,16 @@ function ciniki_conferences_main() {
         }
     };
     this.presentationedit.remove = function() {
-        if( confirm("Are you sure you want to remove '" + this.data.name + "'?") ) {
+        M.confirm("Are you sure you want to remove '" + this.data.name + "'?",null,function() {
             M.api.getJSONCb('ciniki.conferences.presentationDelete', 
-                {'tnid':M.curTenantID, 'presentation_id':this.presentation_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'presentation_id':M.ciniki_conferences_main.presentationedit.presentation_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
                     }
                     M.ciniki_conferences_main.presentation.close();
                 });
-        }
+        });
     };
     this.presentationedit.addButton('save', 'Save', 'M.ciniki_conferences_main.presentationedit.save();');
     this.presentationedit.addClose('Cancel');
@@ -1301,15 +1301,15 @@ function ciniki_conferences_main() {
         }
     };
     this.review.remove = function() {
-        if( confirm("Are you sure you want to remove this review?") ) {
-            M.api.getJSONCb('ciniki.conferences.presentationReviewDelete', {'tnid':M.curTenantID, 'review_id':this.review_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove this review?",null,function() {
+            M.api.getJSONCb('ciniki.conferences.presentationReviewDelete', {'tnid':M.curTenantID, 'review_id':M.ciniki_conferences_main.review.review_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.review.close();
             });
-        }
+        });
     };
     this.review.addButton('save', 'Save', 'M.ciniki_conferences_main.review.save();');
     this.review.addClose('Cancel');
@@ -1395,15 +1395,15 @@ function ciniki_conferences_main() {
         }
     };
     this.cfplog.remove = function() {
-        if( confirm("Are you sure you want to remove this CFP?") ) {
-            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':this.cfplog_id}, function(rsp) {
+        M.confirm("Are you sure you want to remove this CFP?",null,function() {
+            M.api.getJSONCb('ciniki.conferences.CFPLogDelete', {'tnid':M.curTenantID, 'cfplog_id':M.ciniki_conferences_main.cfplog.cfplog_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 }
                 M.ciniki_conferences_main.cfplog.close();
             });
-        }
+        });
     };
     this.cfplog.addButton('save', 'Save', 'M.ciniki_conferences_main.cfplog.save();');
     this.cfplog.addClose('Cancel');
@@ -1422,7 +1422,7 @@ function ciniki_conferences_main() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_conferences_main', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 
