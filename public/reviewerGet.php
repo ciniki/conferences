@@ -93,7 +93,7 @@ function ciniki_conferences_reviewerGet($ciniki) {
             . "AND ciniki_conferences_presentations.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
         . "LEFT JOIN ciniki_customers ON ("
-            . "ciniki_conferences_presentations.customer_id = ciniki_customers.id "
+            . "ciniki_conferences_presentation_reviews.customer_id = ciniki_customers.id "
             . "AND ciniki_customers.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
         . "WHERE ciniki_conferences_presentation_reviews.customer_id = '" . ciniki_core_dbQuote($ciniki, $args['reviewer_id']) . "' "
