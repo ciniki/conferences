@@ -63,8 +63,6 @@ function ciniki_conferences_conferenceGet($ciniki) {
         return $rc;
     }
     $intl_timezone = $rc['settings']['intl-default-timezone'];
-    $intl_currency_fmt = numfmt_create($rc['settings']['intl-default-locale'], NumberFormatter::CURRENCY);
-    $intl_currency = $rc['settings']['intl-default-currency'];
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timeFormat');
